@@ -126,7 +126,7 @@ function Rails({ L1, L2, y1, y2 }) {
 // ═══════════════════════════════════════════════════════════════════
 // DIAGRAMS
 // ═══════════════════════════════════════════════════════════════════
-function D_SimpleLightControl() {
+function DiagSimpleLightControl() {
   const L1=28,L2=500,H=175; const r=[60,118];
   return (
     <svg width="100%" viewBox={`0 0 530 ${H}`} style={{background:"#fff",borderRadius:6,border:"1px solid #e5e7eb"}}>
@@ -143,7 +143,7 @@ function D_SimpleLightControl() {
     </svg>
   );
 }
-function D_TwoLights() {
+function DiagTwoLights() {
   const L1=28,L2=500,H=210; const r=[58,112,163];
   return (
     <svg width="100%" viewBox={`0 0 530 ${H}`} style={{background:"#fff",borderRadius:6,border:"1px solid #e5e7eb"}}>
@@ -160,7 +160,7 @@ function D_TwoLights() {
     </svg>
   );
 }
-function D_ThreeLightsTimer() {
+function DiagThreeLightsTimer() {
   const L1=28,L2=500,H=245; const r=[58,112,162,210];
   return (
     <svg width="100%" viewBox={`0 0 530 ${H}`} style={{background:"#fff",borderRadius:6,border:"1px solid #e5e7eb"}}>
@@ -175,7 +175,7 @@ function D_ThreeLightsTimer() {
     </svg>
   );
 }
-function D_BasicCylinder() {
+function DiagBasicCylinder() {
   const L1=28,L2=500,H=340; const r=[58,112,165];
   return (
     <svg width="100%" viewBox={`0 0 530 ${H}`} style={{background:"#fff",borderRadius:6,border:"1px solid #e5e7eb"}}>
@@ -210,7 +210,7 @@ function D_BasicCylinder() {
     </svg>
   );
 }
-function D_Jogging() {
+function DiagJogging() {
   const L1=28,L2=500,H=210; const r=[60,140];
   return (
     <svg width="100%" viewBox={`0 0 530 ${H}`} style={{background:"#fff",borderRadius:6,border:"1px solid #e5e7eb"}}>
@@ -230,7 +230,7 @@ function D_Jogging() {
     </svg>
   );
 }
-function D_FwdRev() {
+function DiagFwdRev() {
   const L1=28,L2=520,H=265; const r=[60,130,192];
   return (
     <svg width="100%" viewBox={`0 0 550 ${H}`} style={{background:"#fff",borderRadius:6,border:"1px solid #e5e7eb"}}>
@@ -258,7 +258,7 @@ function D_FwdRev() {
     </svg>
   );
 }
-function D_DoubleActing() {
+function DiagDoubleActing() {
   const L1=28,L2=510,H=365; const r=[55,108,160,212];
   return (
     <svg width="100%" viewBox={`0 0 540 ${H}`} style={{background:"#fff",borderRadius:6,border:"1px solid #e5e7eb"}}>
@@ -303,37 +303,37 @@ const CIRCUITS = [
     params:["24V / 0V rails. E-STOP (NC) on 24V rail before all rungs.","Rung 1: NC STOP — NO START — CR1 coil. CR1-1 seal-in contact wired in parallel with START.","Rung 2: NO CR1-2 contact — G (green pilot light).","When START is pressed, CR1 energizes and seals in. Green light turns on. STOP or E-STOP kills everything."],
     tips:["STOP is NC — it must open to kill the relay","Seal-in CR1-1 is in parallel with START so releasing START keeps CR1 held","Pilot light G uses a circle with 4 rays, labeled G"],
     checkpoints:["E-STOP NC on 24V rail","NC STOP present","NO START present","CR1-1 seal-in parallel with START","G light on second rung","All contacts labeled"],
-    diagram:<D_SimpleLightControl/> },
+    diagram:<DiagSimpleLightControl/> },
   { id:2, name:"Run / Stop — Green ON, Red OFF", diff:"Beginner", ch:"Ch. 3", type:"guided",
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NC STOP — NO START — CR1 coil. CR1-1 seal-in parallel with START.","Rung 2: NO CR1-2 — G (green light). Green is ON when running.","Rung 3: NC CR1-3 — R (red light). Red is ON when stopped.","Only one light should be on at a time."],
     tips:["NO CR1 → green: on only when relay is energized","NC CR1 → red: on only when relay is de-energized","Mutually exclusive — when one is on the other is off"],
     checkpoints:["CR1 seal-in rung","NO CR1-2 → G light","NC CR1-3 → R light","Lights mutually exclusive","E-STOP present"],
-    diagram:<D_TwoLights/> },
+    diagram:<DiagTwoLights/> },
   { id:3, name:"Timer → Light Color Change", diff:"Beginner", ch:"Ch. 6", type:"guided",
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NO 1PB — NC 2PB — 1TR coil (TON timer).","Rung 2: NO 1TR-1 (timed contact, draw with downward arrow) — CR1 coil.","Rung 3: NC CR1-1 — Y (yellow light). On before timer expires.","Rung 4: NO CR1-2 — G (green light). On after timer expires.","2PB cancels the timer at any time."],
     tips:["TON: coil energizes immediately, timed contact closes after delay","Timed contact drawn with a downward arrow below the bars","Yellow NC CR1 = on before; Green NO CR1 = on after"],
     checkpoints:["1TR coil labeled TON","Timed contact with downward arrow","CR1 energizes after timer","NC CR1 → Y light","NO CR1 → G light","2PB NC cancels timer"],
-    diagram:<D_ThreeLightsTimer/> },
+    diagram:<DiagThreeLightsTimer/> },
   { id:4, name:"Single-Acting Cylinder w/ Limit Switch", diff:"Beginner", ch:"Ch. 7", type:"guided",
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NC STOP — NO START — CR1 coil. CR1-1 seal-in parallel with START.","Rung 2: NO CR1-2 — NC 2LS (opens when cylinder fully extends) — SOL-A coil (circle with wave).","Rung 3: NO CR1-3 — G (green light, cycle active).","Pneumatic: Air supply → FRL → 3/2 NO solenoid valve (SOL-A) → single-acting spring-return cylinder. Mark 1LS at retract end and 2LS at extend end."],
     tips:["SOL-A symbol is a circle with a squiggle/wave inside","FRL always first after supply","2LS is NC — extension trips it open, cutting SOL-A power"],
     checkpoints:["CR1 seal-in rung","SOL-A solenoid coil with wave symbol","2LS NC in SOL rung","G light on third rung","FRL on pneumatic","3/2 valve symbol","1LS and 2LS on cylinder"],
-    diagram:<D_BasicCylinder/> },
+    diagram:<DiagBasicCylinder/> },
   { id:5, name:"Jogging Circuit", diff:"Intermediate", ch:"Ch. 4", type:"guided",
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NC STOP — NO START — NC JOG — NC OL — M coil. M seal-in (M-1) in parallel with START only, between the START dot and the JOG NC dot.","Rung 2: NO JOG — NC OL — M coil. No seal-in on this rung.","When JOG is pressed: NC JOG breaks the seal-in path, Rung 2 powers M directly. Motor runs only while JOG is held."],
     tips:["NC JOG in Rung 1 must be placed AFTER the seal-in branch junction","Rung 2 has no seal-in — motor stops when JOG is released","OL is NC, in series on both rungs"],
     checkpoints:["NC JOG after seal-in junction in Rung 1","M seal-in between START dot and JOG NC dot","Separate JOG rung NO JOG only","NC OL in both rungs","M coil on both rungs"],
-    diagram:<D_Jogging/> },
+    diagram:<DiagJogging/> },
   { id:6, name:"Forward / Reverse with Electrical Interlock", diff:"Intermediate", ch:"Ch. 5", type:"guided",
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NC STOP — NO F-PB — NC R (interlock) — NC OL — F coil. F-1 seal-in parallel with F-PB.","Rung 2: NC STOP — NO R-PB — NC F (interlock) — NC OL — R coil. R-1 seal-in parallel with R-PB.","Rung 3: NO F-2 — G light.","The NC R in Rung 1 and NC F in Rung 2 prevent F and R energizing simultaneously."],
     tips:["NC R in fwd rung blocks reverse from stealing the circuit","If F pulls in, NC F opens, preventing R from energizing","Seal-ins go in parallel with their own start PB only"],
     checkpoints:["NC R interlock in Forward rung","NC F interlock in Reverse rung","F-1 seal-in parallel with F-PB","R-1 seal-in parallel with R-PB","NC OL in both rungs","G light run indicator"],
-    diagram:<D_FwdRev/> },
+    diagram:<DiagFwdRev/> },
   { id:7, name:"Double-Acting Cylinder — Auto Retract", diff:"Intermediate", ch:"Ch. 7", type:"guided",
     params:["24V / 0V rails. E-STOP (NC) on 24V rail. Draw ladder AND pneumatic.","Rung 1: NC STOP — NO START — NO 1LS (home) — CR1 coil. CR1-1 seal-in parallel with START.","Rung 2: NO CR1-2 — NC SOL-B (interlock) — SOL-A coil (extend).","Rung 3: NO 2LS (fully extended) — NC SOL-A (interlock) — SOL-B coil (retract).","Rung 4: NO CR1-3 — G light.","Pneumatic: FRL → 5/2 double-solenoid valve → double-acting cylinder. 1LS at retract, 2LS at extend."],
     tips:["NC SOL-B in SOL-A rung prevents both solenoids energizing together","1LS in start rung ensures cylinder is home","2LS at full extension triggers auto-retract"],
     checkpoints:["1LS home condition in start rung","CR1 seal-in","NC SOL-B in SOL-A rung","NC SOL-A in SOL-B rung","2LS triggers retract","G light rung","5/2 valve on pneumatic","Both LS on cylinder"],
-    diagram:<D_DoubleActing/> },
+    diagram:<DiagDoubleActing/> },
   // CHALLENGES
   { id:8, name:"Latching Light", diff:"Beginner", ch:"Design", type:"challenge",
     goal:"Nothing is powered until START has been pressed. Once START is pressed, a green light turns on and stays on even after START is released. A STOP button turns the green light back off. Use one relay.",
