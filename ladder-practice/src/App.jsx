@@ -547,7 +547,6 @@ export default function App() {
         headers:{"Content-Type":"application/json","x-api-key":apiKey},
         body:JSON.stringify({
           model:"claude-sonnet-4-20250514",
-          anthropic_version:"2023-06-01",
           max_tokens:1400,
           system:`You are an industrial controls instructor grading hand-drawn 24VDC ladder logic diagrams. You use "Electrical Control for Machines, 7th Edition" (Lobsiger, Giuliani, Rexford) as your curriculum. Symbol conventions: 24V and 0V rails (no rung numbers), NO contacts = two vertical bars with filled dots, NC contacts = same with diagonal slash, coils = circle with label inside, solenoid coils = circle with wave inside, pilot lights = circle with 4 rays labeled G/R/Y/B, limit switches = small box with roller actuator, relay contacts labeled CR1-1/CR1-2 etc, E-STOP NC on 24V rail. Grade against these conventions. Be encouraging, specific, practical. Plain text only. Score out of 10.`,
           messages:[{role:"user",content:[
@@ -559,10 +558,11 @@ export default function App() {
           ]}]
         })
       });
-      if (res.status === 401) { setFeedback("Invalid API key. Click the key icon in the header to update it."); setLoading(false); return; }
+      if (res.status === 401) { setFeedback("Invalid API key. Click the 🔑 button in the header to update it."); setLoading(false); return; }
       const data = await res.json();
+      if (data.error) { setFeedback("API error: " + (data.error.message || data.error || JSON.stringify(data))); setLoading(false); return; }
       setFeedback(data.content?.map(b=>b.text||"").join("\n") || "Could not get feedback.");
-    } catch { setFeedback("Network error. Check your internet connection and try again."); }
+    } catch(err) { setFeedback("Network error: " + err.message); }
     setLoading(false);
   };
 
