@@ -542,11 +542,12 @@ export default function App() {
     try {
       const b64 = dataUrl.split(",")[1];
       const isChallenge = sel.type === "challenge";
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/grade", {
         method:"POST",
-        headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+        headers:{"Content-Type":"application/json","x-api-key":apiKey},
         body:JSON.stringify({
           model:"claude-sonnet-4-20250514",
+          anthropic_version:"2023-06-01",
           max_tokens:1400,
           system:`You are an industrial controls instructor grading hand-drawn 24VDC ladder logic diagrams. You use "Electrical Control for Machines, 7th Edition" (Lobsiger, Giuliani, Rexford) as your curriculum. Symbol conventions: 24V and 0V rails (no rung numbers), NO contacts = two vertical bars with filled dots, NC contacts = same with diagonal slash, coils = circle with label inside, solenoid coils = circle with wave inside, pilot lights = circle with 4 rays labeled G/R/Y/B, limit switches = small box with roller actuator, relay contacts labeled CR1-1/CR1-2 etc, E-STOP NC on 24V rail. Grade against these conventions. Be encouraging, specific, practical. Plain text only. Score out of 10.`,
           messages:[{role:"user",content:[
