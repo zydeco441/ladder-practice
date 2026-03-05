@@ -439,7 +439,7 @@ function ParallelSVG({ el, x, y, H, inputState, coils, powered, onToggle }) {
 
   branches.forEach((branch, bi) => {
     const by = startY + bi * BRANCH_H;
-    const bw = seriesWidth(branch) * SLOT;
+
     const bPowered = powered && evalSeries(branch, inputState, coils);
     const wire = bPowered ? POWERED : DEAD;
 
