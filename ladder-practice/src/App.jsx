@@ -675,64 +675,42 @@ export default function App() {
         body:JSON.stringify({
           model:"claude-sonnet-4-20250514",
           max_tokens:2000,
-          system:`You are a ladder logic circuit parser. You will be given an image of a hand-drawn or PLC-style 24VDC ladder logic diagram. Your job is to extract the circuit topology and return it as a strict JSON object that can be used to simulate the circuit.
-
-Return ONLY a JSON object with no markdown, no explanation, no code fences. Just raw JSON.
-
-The JSON must follow this exact schema:
-{
-  "rungs": [
-    {
-      "id": "r1",
-      "series": [ ...elements... ],
-      "outputs": ["COIL_ID"]
-    }
-  ],
-  "coils": {
-    "COIL_ID": { "label": "CR1", "type": "relay" }
-  },
-  "inputs": {
-    "INPUT_ID": { "label": "START", "type": "pb_no" }
-  }
-}
-
-Element types for series arrays:
-- { "type": "ESTOP", "id": "ESTOP" } — E-STOP NC contact
-- { "type": "NO", "id": "START", "label": "START" } — normally open contact (pushbutton or relay contact)
-- { "type": "NC", "id": "STOP", "label": "STOP" } — normally closed contact
-- { "type": "NO_LS", "id": "1LS", "label": "1LS" } — NO limit switch
-- { "type": "NC_LS", "id": "2LS", "label": "2LS" } — NC limit switch
-- { "type": "PARALLEL", "branches": [[...elements...], [...elements...]] } — parallel (OR) branches
-
-IMPORTANT: For relay contacts (CR1-1, CR1-2 etc), use the BASE relay id as the element id (e.g. id:"CR1" for CR1-1, CR1-2 etc). The label can be the full "CR1-1".
-
-Coil types: "relay", "light", "sol", "motor"
-Light colors: G="#16a34a", R="#dc2626", Y="#eab308", B="#2563eb"
-
-Input types:
-- "estop" — E-STOP (default closed/true)
-- "pb_no" — NO pushbutton (momentary)
-- "pb_nc" — NC pushbutton (STOP button)
-- "ls_no" — NO limit switch (toggle)
-- "ls_nc" — NC limit switch (toggle)
-
-If the circuit is too unclear to parse confidently, return:
-{ "error": "Could not parse: [specific reason why, e.g. labels unreadable, rung structure unclear, missing rail labels]" }`,
+          system:`You are a ladder logic circuit parser. You will be given an image of a hand-drawn or PLC-style 24VDC ladder logic diagram. Extract the circuit topology and return it as a strict JSON object. Return ONLY raw JSON, no markdown, no explanation, no code fences. Schema: {"rungs":[{"id":"r1","series":[...elements...],"outputs":["COIL_ID"]}],"coils":{"COIL_ID":{"label":"CR1","type":"relay"}},"inputs":{"INPUT_ID":{"label":"START","type":"pb_no"}}}. Element types: {type:"ESTOP",id:"ESTOP"}, {type:"NO",id:"START",label:"START"}, {type:"NC",id:"STOP",label:"STOP"}, {type:"NO_LS",id:"1LS",label:"1LS"}, {type:"NC_LS",id:"2LS",label:"2LS"}, {type:"PARALLEL",branches:[[...],[...]]}. For relay contacts CR1-1/CR1-2 use base id e.g. id:"CR1". Coil types: relay, light, sol, motor. Light colors: G=#16a34a R=#dc2626 Y=#eab308 B=#2563eb. Input types: estop, pb_no, pb_nc, ls_no, ls_nc. If too unclear return {"error":"Could not parse: [specific reason]"}`,
           messages:[{role:"user",content:[
             {type:"image",source:{type:"base64",media_type:"image/png",data:b64}},
-            {type:"text",text:"Parse this ladder logic diagram into the JSON circuit topology schema. Return only raw JSON."}
+            {type:"text",text:"Parse this ladder logic diagram into the JSON schema. Return only raw JSON."}
           ]}]
         })
       });
+      if (res.status === 401) { setTestError("Invalid API key."); setPhase2(null); return; }
       const data = await res.json();
+      if (data.error) { setTestError("API error: " + (data.error.message || data.error)); setPhase2(null); return; }
       const raw = data.content?.map(b=>b.text||"").join("") || "";
-      // Strip any accidental markdown fences
       const cleaned = raw.replace(/```json|```/g,"").trim();
       let parsed;
-      try { parsed = JSON.parse(cleaned); }
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch(parseErr) {
+        setTestError("AI returned invalid JSON. Try redrawing with clearer labels and lines.");
+        setPhase2(null);
+        return;
+      }
+      if (parsed.error) {
+        setTestError("Could not simulate: " + parsed.error);
+        setPhase2(null);
+        return;
+      }
+      if (!parsed.rungs || !parsed.coils || !parsed.inputs) {
+        setTestError("AI could not identify a complete circuit. Make sure rails, contacts, and coils are clearly drawn and labeled.");
+        setPhase2(null);
+        return;
+      }
       setAiSimDef(parsed);
       setPhase2("sim");
-    } catch(err) { setTestError("Network error: " + err.message); setPhase2(null); }
+    } catch(err) {
+      setTestError("Network error: " + err.message);
+      setPhase2(null);
+    }
   };
 
   const clearKey = () => { localStorage.removeItem("anthropic_api_key"); setApiKey(""); };
