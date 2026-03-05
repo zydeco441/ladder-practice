@@ -630,7 +630,6 @@ export default function App() {
   const [panel, setPanel] = useState(null);
   const [phase2, setPhase2] = useState(null); // null | "sim"
   const [aiSimDef, setAiSimDef] = useState(null);   // AI-generated sim definition
-  const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState("");
 
   if (!apiKey) return <ApiKeyScreen onSave={setApiKey}/>;
@@ -665,7 +664,6 @@ export default function App() {
   };
 
   const testCircuit = async (dataUrl) => {
-    setTestLoading(true);
     setTestError("");
     setAiSimDef(null);
     setPhase2("sim-loading");
@@ -726,23 +724,17 @@ If the circuit is too unclear to parse confidently, return:
           ]}]
         })
       });
-      if (res.status === 401) { setTestError("Invalid API key."); setPhase2(null); setTestLoading(false); return; }
       const data = await res.json();
       const raw = data.content?.map(b=>b.text||"").join("") || "";
       // Strip any accidental markdown fences
       const cleaned = raw.replace(/```json|```/g,"").trim();
       let parsed;
       try { parsed = JSON.parse(cleaned); }
-      catch(e) { setTestError("AI returned invalid JSON. Try redrawing with clearer labels and lines."); setPhase2(null); setTestLoading(false); return; }
-      if (parsed.error) { setTestError("Could not simulate: " + parsed.error); setPhase2(null); setTestLoading(false); return; }
-      if (!parsed.rungs || !parsed.coils || !parsed.inputs) { setTestError("AI could not identify a complete circuit. Make sure your rails, contacts, and coils are clearly drawn and labeled."); setPhase2(null); setTestLoading(false); return; }
       setAiSimDef(parsed);
       setPhase2("sim");
     } catch(err) { setTestError("Network error: " + err.message); setPhase2(null); }
-    setTestLoading(false);
   };
 
-  const reset = () => { setSel(null); setPhase("select"); setPhase2(null); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); setPanel(null); setAiSimDef(null); setTestError(""); setTestLoading(false); };
   const clearKey = () => { localStorage.removeItem("anthropic_api_key"); setApiKey(""); };
 
   const filters = ["All","Beginner","Intermediate","Advanced","Challenges"];
