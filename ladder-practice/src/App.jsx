@@ -145,7 +145,8 @@ function SymbolIcon({ symbol }) {
         return (
           <>
             {baseWires}
-            <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
+            <line x1={lx} y1={y-8} x2={lx} y2={y+8} {...stroke}/>
+            <line x1={rx} y1={y-8} x2={rx} y2={y+8} {...stroke}/>
             <line x1={lx+3} y1={y+7} x2={rx-3} y2={y-7} {...stroke}/>
           </>
         );
@@ -153,8 +154,8 @@ function SymbolIcon({ symbol }) {
         return (
           <>
             {baseWires}
-            <line x1={lx+1} y1={y-8} x2={rx-1} y2={y-8} {...stroke}/>
-            <line x1={mid} y1={y-8} x2={mid} y2={y-3} {...stroke}/>
+            <line x1={lx+1} y1={y-6} x2={rx-1} y2={y-6} {...stroke}/>
+            <line x1={mid} y1={y-14} x2={mid} y2={y-6} {...stroke}/>
           </>
         );
       case "NC Pushbutton":
@@ -162,8 +163,7 @@ function SymbolIcon({ symbol }) {
           <>
             {baseWires}
             <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
-            <path d={`M${lx+1},${y-1} Q${mid},${y-12} ${rx-1},${y-1}`} {...stroke}/>
-            <line x1={mid} y1={y-9} x2={mid} y2={y-1} {...stroke}/>
+            <line x1={mid} y1={y-12} x2={mid} y2={y} {...stroke}/>
           </>
         );
       case "Coil":
@@ -178,10 +178,8 @@ function SymbolIcon({ symbol }) {
       case "Solenoid":
         return (
           <>
-            <line x1={wireL} y1={y} x2={18} y2={y} {...stroke}/>
-            <path d={`M18,${y} q3,-5 6,0 q3,5 6,0 q3,-5 6,0 q3,5 6,0`} {...stroke}/>
-            <circle cx="42" cy="18" r="2.2" fill={F}/>
-            <line x1={42} y1={y} x2={wireR} y2={y} {...stroke}/>
+            {baseWires}
+            <polyline points={`${lx+2},${y} ${mid-4},${y} ${mid+1},${y-8} ${mid+6},${y+8} ${rx-2},${y}`} {...stroke}/>
           </>
         );
       case "Pilot Light":
@@ -210,19 +208,16 @@ function SymbolIcon({ symbol }) {
         return (
           <>
             {baseWires}
-            <circle cx="13" cy="14" r="1.8" {...stroke}/>
-            <polygon points="15,16 19,12 19,20" {...stroke}/>
-            <line x1="15" y1="15" x2="39" y2="23" {...stroke}/>
+            <polygon points={`${lx+2},${y} ${lx+10},${y-4} ${lx+10},${y+4}`} {...stroke}/>
+            <line x1={lx+2} y1={y} x2={rx-5} y2={y+5} {...stroke}/>
           </>
         );
       case "NC Limit Switch":
         return (
           <>
             {baseWires}
-            <circle cx="13" cy="14" r="1.8" {...stroke}/>
-            <polygon points="15,16 19,12 19,20" {...stroke}/>
-            <line x1="15" y1="15" x2="46" y2="19" {...stroke}/>
-            <line x1="41" y1="22" x2="46" y2="19" {...stroke}/>
+            <polygon points={`${lx+2},${y} ${lx+10},${y-4} ${lx+10},${y+4}`} {...stroke}/>
+            <line x1={lx+2} y1={y} x2={rx-2} y2={y-1} {...stroke}/>
           </>
         );
       case "E-STOP":
@@ -230,9 +225,8 @@ function SymbolIcon({ symbol }) {
           <>
             {baseWires}
             <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
-            <path d={`M${lx+1},${y-1} Q${mid},${y-17} ${rx-1},${y-1}`} {...stroke}/>
-            <line x1={mid} y1={y-10} x2={mid} y2={y-1} {...stroke}/>
-            <circle cx={mid} cy={y-14} r="1.7" fill={F}/>
+            <path d={`M${lx+1},${y-1} Q${mid},${y-14} ${rx-1},${y-1}`} {...stroke}/>
+            <line x1={mid} y1={y} x2={mid} y2={y-9} {...stroke}/>
           </>
         );
       default:
@@ -680,21 +674,17 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
     if (isNC) {
       ctx.beginPath(); ctx.moveTo(lx, y); ctx.lineTo(rx, y); ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(lx + 1, y - 1);
-      ctx.quadraticCurveTo(mid, y - 12, rx - 1, y - 1);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(mid, y - 9);
-      ctx.lineTo(mid, y - 1);
+      ctx.moveTo(mid, y - 12);
+      ctx.lineTo(mid, y);
       ctx.stroke();
     } else {
       ctx.beginPath();
-      ctx.moveTo(lx + 1, y - 8);
-      ctx.lineTo(rx - 1, y - 8);
+      ctx.moveTo(lx + 1, y - 6);
+      ctx.lineTo(rx - 1, y - 6);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(mid, y - 8);
-      ctx.lineTo(mid, y - 3);
+      ctx.moveTo(mid, y - 14);
+      ctx.lineTo(mid, y - 6);
       ctx.stroke();
     }
     ctx.beginPath(); ctx.moveTo(rx, y); ctx.lineTo(x+24, y); ctx.stroke();
@@ -703,35 +693,22 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
   const drawLimitSwitch = (ctx, x, y, isNC) => {
     const lx = x - 10;
     const rx = x + 10;
-    const pivotX = lx - 5;
-    const pivotY = y - 4;
 
     ctx.beginPath(); ctx.moveTo(x-24, y); ctx.lineTo(lx, y); ctx.stroke();
     drawNode(ctx, lx, y);
     drawNode(ctx, rx, y);
 
     ctx.beginPath();
-    ctx.arc(pivotX, pivotY, 1.8, 0, Math.PI*2);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(pivotX + 2, pivotY + 2);
-    ctx.lineTo(pivotX + 6, pivotY - 2);
-    ctx.lineTo(pivotX + 6, pivotY + 6);
+    ctx.moveTo(lx + 2, y);
+    ctx.lineTo(lx + 10, y - 4);
+    ctx.lineTo(lx + 10, y + 4);
     ctx.closePath();
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(pivotX + 2, pivotY + 2);
-    ctx.lineTo(isNC ? rx + 1 : rx - 5, isNC ? y + 1 : y + 5);
+    ctx.moveTo(lx + 2, y);
+    ctx.lineTo(isNC ? rx - 2 : rx - 5, isNC ? y - 1 : y + 5);
     ctx.stroke();
-
-    if (isNC) {
-      ctx.beginPath();
-      ctx.moveTo(rx - 4, y + 5);
-      ctx.lineTo(rx + 1, y + 1);
-      ctx.stroke();
-    }
 
     ctx.beginPath(); ctx.moveTo(rx, y); ctx.lineTo(x+24, y); ctx.stroke();
   };
@@ -753,7 +730,8 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
         drawNode(ctx, x-10, y);
         drawNode(ctx, x+10, y);
-        ctx.beginPath(); ctx.moveTo(x-10, y); ctx.lineTo(x+10, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-10, y-9); ctx.lineTo(x-10, y+9); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+10, y-9); ctx.lineTo(x+10, y+9); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(x-7, y+7); ctx.lineTo(x+7, y-7); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
@@ -770,16 +748,17 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Solenoid":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-14, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        drawNode(ctx, x-10, y);
+        drawNode(ctx, x+10, y);
         ctx.beginPath();
-        ctx.moveTo(x-14, y);
-        ctx.quadraticCurveTo(x-11, y-6, x-8, y);
-        ctx.quadraticCurveTo(x-5, y+6, x-2, y);
-        ctx.quadraticCurveTo(x+1, y-6, x+4, y);
-        ctx.quadraticCurveTo(x+7, y+6, x+10, y);
+        ctx.moveTo(x-8, y);
+        ctx.lineTo(x-3, y);
+        ctx.lineTo(x+2, y-8);
+        ctx.lineTo(x+7, y+8);
+        ctx.lineTo(x+8, y);
         ctx.stroke();
-        drawNode(ctx, x+12, y);
-        ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Pilot Light":
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
@@ -812,10 +791,9 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         ctx.beginPath(); ctx.moveTo(x-8, y); ctx.lineTo(x+12, y); ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x-7, y-1);
-        ctx.quadraticCurveTo(x+2, y-18, x+11, y-1);
+        ctx.quadraticCurveTo(x+2, y-14, x+11, y-1);
         ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+2, y-10); ctx.lineTo(x+2, y-1); ctx.stroke();
-        drawNode(ctx, x+2, y-14, 2);
+        ctx.beginPath(); ctx.moveTo(x+2, y); ctx.lineTo(x+2, y-9); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s+4, y); ctx.stroke();
         break;
       default: break;
