@@ -663,10 +663,10 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
   // Early return AFTER all hooks
   if (!simDef) {
     return (
-      <div style={{background:"#fff",borderRadius:10,padding:28,textAlign:"center",border:"1px solid #e2e8f0"}}>
+      <div style={{background:"rgba(255,255,255,0.9)",borderRadius:14,padding:28,textAlign:"center",border:"1px solid #dbe7f5",boxShadow:"0 14px 28px rgba(77,96,131,0.1)"}}>
         <div style={{fontSize:13,color:"#64748b",marginBottom:12}}>Simulator not available for this circuit yet.</div>
         <div style={{fontSize:11,color:"#94a3b8",marginBottom:16}}>Available for: Start/Stop, Two Lights, Single-Acting Cylinder, Jogging, Forward/Reverse, Double-Acting Cylinder.</div>
-        <button onClick={onClose} style={{background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,padding:"8px 20px",cursor:"pointer",fontSize:12,fontFamily:"'Courier New',monospace",color:"#64748b"}}>← BACK</button>
+        <button onClick={onClose} style={{background:"#eef4ff",border:"1px solid #d3e0f2",borderRadius:10,padding:"8px 20px",cursor:"pointer",fontSize:12,fontFamily:"'IBM Plex Mono','Courier New',monospace",color:"#64748b"}}>← BACK</button>
       </div>
     );
   }
@@ -693,29 +693,29 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
   };
 
   return (
-    <div style={{display:"flex",flexDirection:"column",gap:12,fontFamily:"'Courier New',monospace"}}>
+    <div style={{display:"flex",flexDirection:"column",gap:12,fontFamily:"'Nunito','Trebuchet MS',sans-serif"}}>
       {/* Header */}
-      <div style={{background:"#1e293b",borderRadius:9,padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <div style={{background:"linear-gradient(135deg, #ffffff 0%, #f8f5ff 50%, #ecf8ff 100%)",borderRadius:14,padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",border:"1px solid #dbe7f5",boxShadow:"0 12px 24px rgba(77,96,131,0.09)"}}>
         <div>
-          <div style={{fontSize:9,letterSpacing:4,color:"#475569",textTransform:"uppercase",marginBottom:2}}>Circuit Simulator</div>
-          <div style={{fontSize:14,fontWeight:700,color:"#f8fafc"}}>{circuit.name}</div>
+          <div style={{fontSize:9,letterSpacing:3,color:"#5d6c84",textTransform:"uppercase",marginBottom:2,fontWeight:700}}>Circuit Simulator</div>
+          <div style={{fontSize:14,fontWeight:700,color:"#2f3348"}}>{circuit.name}</div>
         </div>
         <div style={{display:"flex",gap:8}}>
-          <button onClick={handleReset} style={{background:"none",border:"1px solid #334155",borderRadius:5,color:"#64748b",cursor:"pointer",fontSize:10,padding:"5px 10px",letterSpacing:1}}>↺ RESET</button>
-          <button onClick={onClose} style={{background:"none",border:"1px solid #334155",borderRadius:5,color:"#64748b",cursor:"pointer",fontSize:10,padding:"5px 10px",letterSpacing:1}}>← BACK</button>
+          <button onClick={handleReset} style={{background:"#eef4ff",border:"1px solid #d3e0f2",borderRadius:10,color:"#5b6a82",cursor:"pointer",fontSize:10,padding:"6px 10px",fontFamily:"'IBM Plex Mono','Courier New',monospace"}}>RESET</button>
+          <button onClick={onClose} style={{background:"#eef4ff",border:"1px solid #d3e0f2",borderRadius:10,color:"#5b6a82",cursor:"pointer",fontSize:10,padding:"6px 10px",fontFamily:"'IBM Plex Mono','Courier New',monospace"}}>BACK</button>
         </div>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"1fr 260px",gap:12}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))",gap:12}}>
         {/* Ladder diagram */}
-        <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:16}}>
+        <div style={{background:"rgba(255,255,255,0.9)",border:"1px solid #dbe7f5",borderRadius:14,padding:16,boxShadow:"0 10px 22px rgba(77,96,131,0.08)"}}>
           <div style={{fontSize:9,letterSpacing:4,color:"#94a3b8",textTransform:"uppercase",marginBottom:12}}>Live Ladder Diagram</div>
           {/* Rail labels */}
           <div style={{display:"flex",justifyContent:"space-between",padding:"0 2px",marginBottom:4}}>
             <span style={{fontSize:10,fontWeight:700,color:INK}}>24V</span>
             <span style={{fontSize:10,fontWeight:700,color:INK}}>0V</span>
           </div>
-          <div style={{borderLeft:"3px solid #1e293b",borderRight:"3px solid #1e293b",padding:"4px 0"}}>
+          <div style={{borderLeft:"3px solid #334155",borderRight:"3px solid #334155",padding:"4px 0"}}>
             {simDef.rungs.map((rung, i) => {
               const pw = getRungPowered(rung);
               return (
@@ -740,7 +740,7 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
         {/* Controls + Output panel */}
         <div style={{display:"flex",flexDirection:"column",gap:10}}>
           {/* Inputs */}
-          <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:14}}>
+          <div style={{background:"rgba(255,255,255,0.9)",border:"1px solid #dbe7f5",borderRadius:14,padding:14,boxShadow:"0 10px 22px rgba(77,96,131,0.08)"}}>
             <div style={{fontSize:9,letterSpacing:4,color:"#94a3b8",textTransform:"uppercase",marginBottom:10}}>Inputs / Switches</div>
             {Object.entries(simDef.inputs).map(([id, def]) => {
               const active = inputState[id];
@@ -757,11 +757,11 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
                       width:"100%",
                       padding:"8px 10px",
                       background: bg,
-                      border:"2px solid "+(active?"#1e293b":"#e2e8f0"),
-                      borderRadius:7,
+                      border:"2px solid "+(active?"#334155":"#dbe7f5"),
+                      borderRadius:10,
                       cursor:"pointer",
                       fontSize:10,
-                      fontFamily:"'Courier New',monospace",
+                      fontFamily:"'IBM Plex Mono','Courier New',monospace",
                       fontWeight:700,
                       color: active&&bg!=="#e2e8f0" ? "#fff" : "#475569",
                       letterSpacing:1,
@@ -776,7 +776,7 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
           </div>
 
           {/* Outputs */}
-          <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:14}}>
+          <div style={{background:"rgba(255,255,255,0.9)",border:"1px solid #dbe7f5",borderRadius:14,padding:14,boxShadow:"0 10px 22px rgba(77,96,131,0.08)"}}>
             <div style={{fontSize:9,letterSpacing:4,color:"#94a3b8",textTransform:"uppercase",marginBottom:10}}>Outputs</div>
             {Object.entries(simDef.coils).map(([id, def]) => {
               const on = coils[id];

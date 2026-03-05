@@ -115,10 +115,11 @@ function EStop({ x, y }) {
 
 function SymbolIcon({ symbol }) {
   const y = 18;
-  const lx = 20;
-  const rx = 44;
-  const wireL = 8;
-  const wireR = 56;
+  const lx = 19;
+  const rx = 45;
+  const wireL = 7;
+  const wireR = 57;
+  const mid = (lx + rx) / 2;
   const stroke = { stroke: F, strokeWidth: 1.8, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" };
 
   const baseWires = (
@@ -145,15 +146,15 @@ function SymbolIcon({ symbol }) {
           <>
             {baseWires}
             <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
-            <line x1={lx-3} y1={y+7} x2={rx+3} y2={y-7} {...stroke}/>
+            <line x1={lx+3} y1={y+7} x2={rx-3} y2={y-7} {...stroke}/>
           </>
         );
       case "NO Pushbutton":
         return (
           <>
             {baseWires}
-            <line x1={lx-2} y1={y-7} x2={rx+2} y2={y-7} {...stroke}/>
-            <line x1={32} y1={y-7} x2={32} y2={y-2} {...stroke}/>
+            <line x1={lx+1} y1={y-8} x2={rx-1} y2={y-8} {...stroke}/>
+            <line x1={mid} y1={y-8} x2={mid} y2={y-3} {...stroke}/>
           </>
         );
       case "NC Pushbutton":
@@ -161,8 +162,8 @@ function SymbolIcon({ symbol }) {
           <>
             {baseWires}
             <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
-            <line x1={lx-2} y1={y+7} x2={rx+2} y2={y+7} {...stroke}/>
-            <line x1={32} y1={y+2} x2={32} y2={y+7} {...stroke}/>
+            <path d={`M${lx+1},${y-1} Q${mid},${y-12} ${rx-1},${y-1}`} {...stroke}/>
+            <line x1={mid} y1={y-9} x2={mid} y2={y-1} {...stroke}/>
           </>
         );
       case "Coil":
@@ -177,10 +178,10 @@ function SymbolIcon({ symbol }) {
       case "Solenoid":
         return (
           <>
-            <line x1={wireL} y1={y} x2={14} y2={y} {...stroke}/>
-            <polyline points="14,18 19,12 24,24 29,12 34,24 39,18" {...stroke}/>
-            <circle cx="40" cy="18" r="2.2" fill={F}/>
-            <line x1={40} y1={y} x2={wireR} y2={y} {...stroke}/>
+            <line x1={wireL} y1={y} x2={18} y2={y} {...stroke}/>
+            <path d={`M18,${y} q3,-5 6,0 q3,5 6,0 q3,-5 6,0 q3,5 6,0`} {...stroke}/>
+            <circle cx="42" cy="18" r="2.2" fill={F}/>
+            <line x1={42} y1={y} x2={wireR} y2={y} {...stroke}/>
           </>
         );
       case "Pilot Light":
@@ -209,19 +210,19 @@ function SymbolIcon({ symbol }) {
         return (
           <>
             {baseWires}
-            <circle cx="14" cy="13" r="1.7" {...stroke}/>
-            <polygon points="16,16 20,12 20,20" {...stroke}/>
-            <line x1="21" y1="16" x2="39" y2="22" {...stroke}/>
+            <circle cx="13" cy="14" r="1.8" {...stroke}/>
+            <polygon points="15,16 19,12 19,20" {...stroke}/>
+            <line x1="15" y1="15" x2="39" y2="23" {...stroke}/>
           </>
         );
       case "NC Limit Switch":
         return (
           <>
             {baseWires}
-            <circle cx="14" cy="13" r="1.7" {...stroke}/>
-            <polygon points="16,16 20,12 20,20" {...stroke}/>
-            <line x1="21" y1="16" x2="44" y2="18" {...stroke}/>
-            <line x1="41" y1="20" x2="44" y2="18" {...stroke}/>
+            <circle cx="13" cy="14" r="1.8" {...stroke}/>
+            <polygon points="15,16 19,12 19,20" {...stroke}/>
+            <line x1="15" y1="15" x2="46" y2="19" {...stroke}/>
+            <line x1="41" y1="22" x2="46" y2="19" {...stroke}/>
           </>
         );
       case "E-STOP":
@@ -229,8 +230,9 @@ function SymbolIcon({ symbol }) {
           <>
             {baseWires}
             <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
-            <path d="M22 18 Q32 1 42 18" {...stroke}/>
-            <line x1="32" y1="9" x2="32" y2="17" {...stroke}/>
+            <path d={`M${lx+1},${y-1} Q${mid},${y-17} ${rx-1},${y-1}`} {...stroke}/>
+            <line x1={mid} y1={y-10} x2={mid} y2={y-1} {...stroke}/>
+            <circle cx={mid} cy={y-14} r="1.7" fill={F}/>
           </>
         );
       default:
@@ -595,8 +597,8 @@ function ApiKeyScreen({ onSave }) {
   };
 
   return (
-    <div style={{minHeight:"100vh",background:"#f1f5f9",display:"flex",alignItems:"center",justifyContent:"center",padding:16,fontFamily:"'Courier New',monospace"}}>
-      <div style={{background:"#fff",borderRadius:14,padding:"36px 32px",maxWidth:480,width:"100%",boxShadow:"0 4px 32px rgba(0,0,0,0.08)"}}>
+    <div style={{minHeight:"100vh",background:"radial-gradient(circle at 12% 8%, #fff5e8 0%, #f7f8ff 46%, #eef7ff 100%)",display:"flex",alignItems:"center",justifyContent:"center",padding:16,fontFamily:"'Nunito','Trebuchet MS',sans-serif"}}>
+      <div style={{background:"rgba(255,255,255,0.9)",borderRadius:18,padding:"36px 32px",maxWidth:480,width:"100%",boxShadow:"0 16px 38px rgba(77,96,131,0.12)",border:"1px solid #dbe7f5",backdropFilter:"blur(4px)"}}>
         <div style={{fontSize:9,letterSpacing:5,color:"#475569",textTransform:"uppercase",marginBottom:8}}>Electrical Control for Machines — 7th Ed.</div>
         <h1 style={{fontSize:22,fontWeight:900,color:"#0f172a",marginBottom:4}}>Ladder Logic Practice</h1>
         <p style={{fontSize:12,color:"#64748b",marginBottom:28,lineHeight:1.7}}>
@@ -610,19 +612,19 @@ function ApiKeyScreen({ onSave }) {
               value={key}
               onChange={e=>{setKey(e.target.value);setErr("");}}
               placeholder="sk-ant-api03-..."
-              style={{flex:1,padding:"10px 12px",border:"1px solid #e2e8f0",borderRadius:7,fontSize:12,fontFamily:"'Courier New',monospace",outline:"none",color:"#0f172a"}}
+              style={{flex:1,padding:"10px 12px",border:"1px solid #dbe7f5",borderRadius:12,fontSize:12,fontFamily:"'IBM Plex Mono','Courier New',monospace",outline:"none",color:"#0f172a",background:"#fff"}}
               onKeyDown={e=>e.key==="Enter"&&save()}
             />
-            <button onClick={()=>setShow(!show)} style={{background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,padding:"0 12px",cursor:"pointer",fontSize:12,color:"#64748b"}}>
+            <button onClick={()=>setShow(!show)} style={{background:"#eef4ff",border:"1px solid #d4e1f2",borderRadius:12,padding:"0 12px",cursor:"pointer",fontSize:12,color:"#64748b",fontFamily:"'Nunito','Trebuchet MS',sans-serif"}}>
               {show?"Hide":"Show"}
             </button>
           </div>
           {err && <div style={{color:"#dc2626",fontSize:11,marginTop:6}}>{err}</div>}
         </div>
-        <button onClick={save} style={{width:"100%",background:"#1d4ed8",border:"none",borderRadius:8,color:"#fff",padding:"12px",cursor:"pointer",fontSize:13,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace",marginTop:4}}>
+        <button onClick={save} style={{width:"100%",background:"linear-gradient(135deg, #4f46e5 0%, #0891b2 100%)",border:"none",borderRadius:12,color:"#fff",padding:"12px",cursor:"pointer",fontSize:13,fontWeight:700,letterSpacing:1,fontFamily:"'Nunito','Trebuchet MS',sans-serif",marginTop:4}}>
           START PRACTICING →
         </button>
-        <div style={{marginTop:20,background:"#f8fafc",borderRadius:8,padding:"12px 14px"}}>
+        <div style={{marginTop:20,background:"#f3f7ff",borderRadius:12,padding:"12px 14px",border:"1px solid #dbe7f5"}}>
           <div style={{fontSize:10,fontWeight:700,color:"#475569",letterSpacing:2,textTransform:"uppercase",marginBottom:6}}>How to get a free API key</div>
           <div style={{fontSize:11,color:"#64748b",lineHeight:1.8}}>
             1. Go to <strong>console.anthropic.com</strong><br/>
@@ -671,43 +673,66 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
   const drawPushbutton = (ctx, x, y, isNC) => {
     const lx = x - 10;
     const rx = x + 10;
+    const mid = (lx + rx) / 2;
     ctx.beginPath(); ctx.moveTo(x-24, y); ctx.lineTo(lx, y); ctx.stroke();
     drawNode(ctx, lx, y);
     drawNode(ctx, rx, y);
     if (isNC) {
       ctx.beginPath(); ctx.moveTo(lx, y); ctx.lineTo(rx, y); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(lx + 1, y - 1);
+      ctx.quadraticCurveTo(mid, y - 12, rx - 1, y - 1);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(mid, y - 9);
+      ctx.lineTo(mid, y - 1);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(lx + 1, y - 8);
+      ctx.lineTo(rx - 1, y - 8);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(mid, y - 8);
+      ctx.lineTo(mid, y - 3);
+      ctx.stroke();
     }
-    const barY = isNC ? y + 7 : y - 7;
-    ctx.beginPath(); ctx.moveTo(lx-2, barY); ctx.lineTo(rx+2, barY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x, barY); ctx.lineTo(x, isNC ? y + 2 : y - 2); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(rx, y); ctx.lineTo(x+24, y); ctx.stroke();
   };
 
   const drawLimitSwitch = (ctx, x, y, isNC) => {
     const lx = x - 10;
     const rx = x + 10;
+    const pivotX = lx - 5;
+    const pivotY = y - 4;
+
     ctx.beginPath(); ctx.moveTo(x-24, y); ctx.lineTo(lx, y); ctx.stroke();
     drawNode(ctx, lx, y);
     drawNode(ctx, rx, y);
+
     ctx.beginPath();
-    ctx.arc(lx-6, y-4, 1.8, 0, Math.PI*2);
+    ctx.arc(pivotX, pivotY, 1.8, 0, Math.PI*2);
     ctx.stroke();
+
     ctx.beginPath();
-    ctx.moveTo(lx-4, y-1);
-    ctx.lineTo(lx, y-5);
-    ctx.lineTo(lx, y+3);
+    ctx.moveTo(pivotX + 2, pivotY + 2);
+    ctx.lineTo(pivotX + 6, pivotY - 2);
+    ctx.lineTo(pivotX + 6, pivotY + 6);
     ctx.closePath();
     ctx.stroke();
+
     ctx.beginPath();
-    ctx.moveTo(lx+1, y-2);
-    ctx.lineTo(isNC ? rx : rx-4, y+3);
+    ctx.moveTo(pivotX + 2, pivotY + 2);
+    ctx.lineTo(isNC ? rx + 1 : rx - 5, isNC ? y + 1 : y + 5);
     ctx.stroke();
+
     if (isNC) {
       ctx.beginPath();
-      ctx.moveTo(rx-2, y+3);
-      ctx.lineTo(rx+1, y+1);
+      ctx.moveTo(rx - 4, y + 5);
+      ctx.lineTo(rx + 1, y + 1);
       ctx.stroke();
     }
+
     ctx.beginPath(); ctx.moveTo(rx, y); ctx.lineTo(x+24, y); ctx.stroke();
   };
 
@@ -729,7 +754,7 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         drawNode(ctx, x-10, y);
         drawNode(ctx, x+10, y);
         ctx.beginPath(); ctx.moveTo(x-10, y); ctx.lineTo(x+10, y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-13, y+7); ctx.lineTo(x+13, y-7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-7, y+7); ctx.lineTo(x+7, y-7); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "NO Pushbutton":
@@ -748,14 +773,13 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-14, y); ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(x-14, y);
-        ctx.lineTo(x-9, y-6);
-        ctx.lineTo(x-4, y+6);
-        ctx.lineTo(x+1, y-6);
-        ctx.lineTo(x+6, y+6);
-        ctx.lineTo(x+10, y);
+        ctx.quadraticCurveTo(x-11, y-6, x-8, y);
+        ctx.quadraticCurveTo(x-5, y+6, x-2, y);
+        ctx.quadraticCurveTo(x+1, y-6, x+4, y);
+        ctx.quadraticCurveTo(x+7, y+6, x+10, y);
         ctx.stroke();
-        drawNode(ctx, x+10, y);
-        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        drawNode(ctx, x+12, y);
+        ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Pilot Light":
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
@@ -787,10 +811,11 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         drawNode(ctx, x+12, y);
         ctx.beginPath(); ctx.moveTo(x-8, y); ctx.lineTo(x+12, y); ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(x-8, y);
-        ctx.quadraticCurveTo(x+2, y-17, x+12, y);
+        ctx.moveTo(x-7, y-1);
+        ctx.quadraticCurveTo(x+2, y-18, x+11, y-1);
         ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+2, y-9); ctx.lineTo(x+2, y-1); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+2, y-10); ctx.lineTo(x+2, y-1); ctx.stroke();
+        drawNode(ctx, x+2, y-14, 2);
         ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s+4, y); ctx.stroke();
         break;
       default: break;
@@ -903,11 +928,11 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
 
   return (
     <div style={{display:"flex",flexDirection:"column",gap:8}}>
-      <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",background:"#f9fafb",border:"1px solid #e5e7eb",borderRadius:7,padding:"7px 10px"}}>
+      <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",background:"rgba(255,255,255,0.88)",border:"1px solid #dbe7f5",borderRadius:12,padding:"8px 11px",boxShadow:"0 8px 18px rgba(77,96,131,0.08)"}}>
         <div style={{display:"flex",gap:4}}>
           {[["pen","✏️"],["text","T"],["eraser","⬜"]].map(([t,l])=>(
             <button key={t} onClick={()=>{commitText();setTool(t);}}
-              style={{background:tool===t?"#1e3a8a":"#e5e7eb",color:tool===t?"#fff":"#4b5563",border:"none",borderRadius:5,padding:"5px 10px",cursor:"pointer",fontSize:t==="text"?13:12,fontWeight:t==="text"?"bold":"normal",fontFamily:"'Courier New',monospace",minWidth:36}}>
+              style={{background:tool===t?"#4f46e5":"#e7eef9",color:tool===t?"#fff":"#4d5c75",border:"none",padding:"6px 10px",cursor:"pointer",fontSize:t==="text"?13:12,fontWeight:t==="text"?"bold":"normal",fontFamily:"'IBM Plex Mono','Courier New',monospace",minWidth:36}}>
               {l}
             </button>
           ))}
@@ -922,7 +947,7 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
           <div style={{display:"flex",gap:3,alignItems:"center"}}>
             {WS.map(w=>(
               <button key={w} onClick={()=>setLw(w)}
-                style={{width:26,height:26,borderRadius:4,background:lw===w?"#dbeafe":"transparent",border:"1px solid "+(lw===w?"#3b82f6":"#d1d5db"),cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                style={{width:26,height:26,borderRadius:8,background:lw===w?"#e8eaff":"transparent",border:"1px solid "+(lw===w?"#4f46e5":"#d1ddef"),cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
                 <div style={{width:Math.min(w*2.5,16),height:Math.max(w,1),background:"#6b7280",borderRadius:1}}/>
               </button>
             ))}
@@ -933,30 +958,30 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
             <span style={{fontSize:9,color:"#94a3b8",letterSpacing:1}}>SIZE</span>
             {FS.map(s=>(
               <button key={s} onClick={()=>setFontSize(s)}
-                style={{minWidth:28,height:26,borderRadius:4,background:fontSize===s?"#dbeafe":"transparent",border:"1px solid "+(fontSize===s?"#3b82f6":"#d1d5db"),cursor:"pointer",fontSize:9,color:"#475569",fontFamily:"'Courier New',monospace"}}>
+                style={{minWidth:28,height:26,borderRadius:8,background:fontSize===s?"#e8eaff":"transparent",border:"1px solid "+(fontSize===s?"#4f46e5":"#d1ddef"),cursor:"pointer",fontSize:9,color:"#475569",fontFamily:"'IBM Plex Mono','Courier New',monospace"}}>
                 {s}
               </button>
             ))}
           </div>
         )}
         <div style={{display:"flex",gap:4,marginLeft:"auto"}}>
-          <button onClick={()=>setShowSymbols(!showSymbols)} style={{background:showSymbols?"#dcfce7":"#f3f4f6",border:"1px solid "+(showSymbols?"#22c55e":"#e5e7eb"),borderRadius:5,color:showSymbols?"#15803d":"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace",fontWeight:700}}>⚡ Symbols</button>
-          <button onClick={undo} style={{background:"#f3f4f6",border:"1px solid #e5e7eb",borderRadius:5,color:"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace"}}>↩ Undo</button>
-          <button onClick={clear} style={{background:"#f3f4f6",border:"1px solid #e5e7eb",borderRadius:5,color:"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace"}}>🗑 Clear</button>
+          <button onClick={()=>setShowSymbols(!showSymbols)} style={{background:showSymbols?"#dff7f2":"#eef4ff",border:"1px solid "+(showSymbols?"#14b8a6":"#d1ddef"),color:showSymbols?"#0f766e":"#56627a",padding:"6px 10px",cursor:"pointer",fontSize:11,fontFamily:"'IBM Plex Mono','Courier New',monospace",fontWeight:700}}>Symbols</button>
+          <button onClick={undo} style={{background:"#eef4ff",border:"1px solid #d1ddef",color:"#56627a",padding:"6px 10px",cursor:"pointer",fontSize:11,fontFamily:"'IBM Plex Mono','Courier New',monospace"}}>Undo</button>
+          <button onClick={clear} style={{background:"#eef4ff",border:"1px solid #d1ddef",color:"#56627a",padding:"6px 10px",cursor:"pointer",fontSize:11,fontFamily:"'IBM Plex Mono','Courier New',monospace"}}>Clear</button>
         </div>
       </div>
       {showSymbols && (
-        <div style={{background:"#f9fafb",border:"1px solid #e5e7eb",borderRadius:8,padding:12,marginBottom:12}}>
+        <div style={{background:"rgba(255,255,255,0.92)",border:"1px solid #dbe7f5",borderRadius:12,padding:12,marginBottom:12,boxShadow:"0 8px 18px rgba(77,96,131,0.08)"}}>
           <div style={{fontSize:9,fontWeight:700,color:"#475569",marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>Click a symbol, then click the canvas to place it</div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,fontSize:9}}>
             {["NO Contact","NC Contact","NO Pushbutton","NC Pushbutton","Coil","Solenoid","Pilot Light","Timer","NO Limit Switch","NC Limit Switch","E-STOP"].map(sym=>(
-              <div key={sym} onClick={()=>handleSymbolClick(sym)} style={{padding:8,background:symbolMode===sym?"#dbeafe":"#fff",border:"1px solid "+(symbolMode===sym?"#0284c7":"#e2e8f0"),borderRadius:4,cursor:"pointer",transition:"0.2s"}}
-                onMouseEnter={(e)=>{if(symbolMode!==sym)e.currentTarget.style.background="#f0f9ff";}}
-                onMouseLeave={(e)=>{e.currentTarget.style.background=symbolMode===sym?"#dbeafe":"#fff";}}>
+              <div key={sym} onClick={()=>handleSymbolClick(sym)} style={{padding:8,background:symbolMode===sym?"#e8eaff":"#fff",border:"1px solid "+(symbolMode===sym?"#4f46e5":"#dce7f6"),borderRadius:10,cursor:"pointer",transition:"0.2s"}}
+                onMouseEnter={(e)=>{if(symbolMode!==sym)e.currentTarget.style.background="#f5f8ff";}}
+                onMouseLeave={(e)=>{e.currentTarget.style.background=symbolMode===sym?"#e8eaff":"#fff";}}>
                 <div style={{display:"flex",justifyContent:"center",marginBottom:2}}>
                   <SymbolIcon symbol={sym}/>
                 </div>
-                <strong style={{color:symbolMode===sym?"#0284c7":"#334155",display:"block",textAlign:"center"}}>{sym}</strong>
+                <strong style={{color:symbolMode===sym?"#4f46e5":"#334155",display:"block",textAlign:"center"}}>{sym}</strong>
                 <div style={{fontSize:8,color:"#94a3b8",marginTop:4,textAlign:"center"}}>{symbolMode===sym?"Click canvas to place ->":""}</div>
               </div>
             ))}
@@ -964,11 +989,11 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         </div>
       )}
       {tool==="text" && (
-        <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:5,padding:"5px 10px",fontSize:10,color:"#3b82f6"}}>
+        <div style={{background:"#f2f7ff",border:"1px solid #cfe0f5",borderRadius:10,padding:"7px 11px",fontSize:10,color:"#3f5a93"}}>
           Click anywhere on the canvas to place text, then type. Press Enter or click elsewhere to confirm.
         </div>
       )}
-      <div style={{position:"relative",border:"2px solid #d1d5db",borderRadius:7,overflow:"hidden",cursor}}>
+      <div style={{position:"relative",border:"2px solid #d1ddef",borderRadius:12,overflow:"hidden",cursor,boxShadow:"0 10px 22px rgba(77,96,131,0.08)"}}>
         <canvas ref={ref} width={920} height={560} style={{display:"block",width:"100%",touchAction:"none"}}
           onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up}
           onTouchStart={dn} onTouchMove={mv} onTouchEnd={up}/>
@@ -977,11 +1002,11 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
       </div>
       <div style={{display:"flex",gap:10}}>
         <button onClick={()=>{commitText();onSubmit(ref.current.toDataURL("image/png"));}}
-          style={{flex:1,background:"#1d4ed8",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
+          style={{flex:1,background:"linear-gradient(135deg, #4f46e5 0%, #0ea5a4 100%)",border:"none",color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:1,fontFamily:"'IBM Plex Mono','Courier New',monospace"}}>
           CHECK FOR MISTAKES →
         </button>
         <button onClick={()=>{commitText();onTest(ref.current.toDataURL("image/png"));}}
-          style={{flex:1,background:"#0f766e",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
+          style={{flex:1,background:"linear-gradient(135deg, #0ea5a4 0%, #f97316 100%)",border:"none",color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:1,fontFamily:"'IBM Plex Mono','Courier New',monospace"}}>
           ⚡ TEST MY CIRCUIT
         </button>
       </div>
@@ -1142,17 +1167,80 @@ export default function App() {
   };
 
   return (
-    <div style={{minHeight:"100vh",background:"#f1f5f9",fontFamily:"'Courier New',monospace",color:"#1e293b",padding:"16px"}}>
-      <div style={{maxWidth:980,margin:"0 auto"}}>
-        <div style={{background:"#1e293b",borderRadius:10,padding:"14px 20px",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+    <div data-soft-ui="1" style={{minHeight:"100vh",background:"radial-gradient(circle at 8% -6%, #fff2df 0%, #f7f8ff 44%, #eaf7ff 100%)",fontFamily:"'Nunito','Trebuchet MS',sans-serif",color:"#2f3348",padding:"16px 14px 24px"}}>
+      <style>{`
+        @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap");
+
+        [data-soft-ui="1"] {
+          --ui-ink: #2f3348;
+          --ui-muted: #5c6a82;
+          --ui-border: #dbe7f5;
+          --ui-panel: rgba(255, 255, 255, 0.88);
+          --ui-shadow: 0 14px 32px rgba(77, 96, 131, 0.1);
+        }
+
+        [data-soft-ui="1"] button {
+          border-radius: 12px !important;
+          font-family: "Nunito", "Trebuchet MS", sans-serif !important;
+          letter-spacing: 0.35px !important;
+          transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        [data-soft-ui="1"] button:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 8px 18px rgba(76, 96, 131, 0.16);
+        }
+
+        [data-soft-ui="1"] button:active {
+          transform: translateY(0);
+        }
+
+        [data-soft-ui="1"] input,
+        [data-soft-ui="1"] textarea {
+          border-radius: 12px !important;
+          font-family: "Nunito", "Trebuchet MS", sans-serif !important;
+        }
+
+        [data-soft-ui="1"] .soft-panel {
+          background: var(--ui-panel);
+          border: 1px solid var(--ui-border);
+          box-shadow: var(--ui-shadow);
+          backdrop-filter: blur(4px);
+        }
+
+        [data-soft-ui="1"] .soft-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+        }
+
+        [data-soft-ui="1"] .soft-grid-select {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 12px;
+        }
+
+        [data-soft-ui="1"] .mono {
+          font-family: "IBM Plex Mono", "Courier New", monospace;
+        }
+
+        @media (max-width: 930px) {
+          [data-soft-ui="1"] .soft-grid-2 {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <div style={{maxWidth:1040,margin:"0 auto"}}>
+        <div className="soft-panel" style={{background:"linear-gradient(135deg, #ffffff 0%, #f8f5ff 48%, #ecf8ff 100%)",borderRadius:16,padding:"14px 20px",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
           <div>
-            <div style={{fontSize:9,letterSpacing:5,color:"#475569",textTransform:"uppercase",marginBottom:3}}>Electrical Control for Machines — 7th Ed.</div>
-            <h1 style={{margin:0,fontSize:20,fontWeight:900,color:"#f8fafc",letterSpacing:1}}>Ladder Logic Practice</h1>
+            <div style={{fontSize:9,letterSpacing:4,color:"#607089",textTransform:"uppercase",marginBottom:3,fontWeight:700}}>Electrical Control for Machines — 7th Ed.</div>
+            <h1 style={{margin:0,fontSize:22,fontWeight:900,color:"#2f3348",letterSpacing:0.4}}>Ladder Logic Practice</h1>
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
-            {sel && phase!=="select" && <button onClick={reset} style={{background:"none",border:"1px solid #334155",borderRadius:5,color:"#64748b",cursor:"pointer",fontSize:10,padding:"5px 12px",letterSpacing:2}}>← ALL</button>}
-            <button onClick={clearKey} title="Change API Key" style={{background:"none",border:"1px solid #334155",borderRadius:5,color:"#475569",cursor:"pointer",fontSize:11,padding:"5px 10px"}}>🔑 API Key</button>
-            <div style={{color:"#64748b",fontSize:10,letterSpacing:1,paddingLeft:8,borderLeft:"1px solid #334155"}}>v{packageJson.version}</div>
+            {sel && phase!=="select" && <button onClick={reset} style={{background:"#eef4ff",border:"1px solid #d3e0f2",color:"#55647d",cursor:"pointer",fontSize:10,padding:"6px 12px"}}>← ALL</button>}
+            <button onClick={clearKey} title="Change API Key" style={{background:"#fff",border:"1px solid #d3e0f2",color:"#55647d",cursor:"pointer",fontSize:11,padding:"6px 10px"}}>🔑 API Key</button>
+            <div className="mono" style={{color:"#607089",fontSize:10,letterSpacing:0.6,paddingLeft:8,borderLeft:"1px solid #d3e0f2"}}>v{packageJson.version}</div>
           </div>
         </div>
 
@@ -1160,31 +1248,32 @@ export default function App() {
           <>
             <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
               {filters.map(f=>(
-                <button key={f} onClick={()=>setFilter(f)} style={{background:filter===f?"#1e293b":"#fff",color:filter===f?"#f8fafc":"#64748b",border:"1px solid "+(filter===f?"#1e293b":"#e2e8f0"),borderRadius:6,padding:"6px 12px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace",letterSpacing:1}}>
+                <button key={f} onClick={()=>setFilter(f)} style={{background:filter===f?"#4f46e5":"rgba(255,255,255,0.86)",color:filter===f?"#f8faff":"#55647d",border:"1px solid "+(filter===f?"#4f46e5":"#d7e4f4"),padding:"7px 12px",cursor:"pointer",fontSize:11,fontWeight:700}}>
                   {f}
                 </button>
               ))}
               <button
                 onClick={startRandomCircuit}
-                style={{background:"#0f766e",color:"#ecfeff",border:"1px solid #115e59",borderRadius:6,padding:"6px 12px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace",letterSpacing:1,fontWeight:700}}
+                style={{background:"linear-gradient(135deg, #0891b2 0%, #f97316 100%)",color:"#fff",border:"1px solid transparent",padding:"7px 12px",cursor:"pointer",fontSize:11,fontWeight:800}}
               >
                 RANDOM + TWIST
               </button>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))",gap:10}}>
+            <div className="soft-grid-select">
               <button onClick={()=>{setSel({id:"sandbox",name:"Sandbox Mode",type:"sandbox"});setPhase("draw");setShowRef(false);setShowHints(false);setCreativeTwist(null);setLastTwistId(null);setPanel(null);}}
-                style={{background:"linear-gradient(135deg, #667eea 0%, #764ba2 100%)",border:"2px solid #667eea",borderRadius:9,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.12s",color:"#fff"}}
-                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 20px rgba(102,126,234,0.3)";}}
+                style={{background:"linear-gradient(140deg, #06b6d4 0%, #f59e0b 100%)",border:"2px solid #67d4dc",borderRadius:14,padding:"15px",textAlign:"left",cursor:"pointer",transition:"all 0.12s",color:"#fff"}}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 12px 24px rgba(52,125,133,0.28)";}}
                 onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
-                <div style={{fontSize:11,letterSpacing:3,fontWeight:700,marginBottom:6}}>⚙️ EXPERIMENTAL</div>
+                <div style={{fontSize:11,letterSpacing:2,fontWeight:800,marginBottom:6}}>EXPERIMENTAL</div>
                 <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>Sandbox Mode</div>
                 <div style={{fontSize:11}}>Free-form circuit building • Test & simulate • No grading</div>
               </button>
               {visible.map(c=>(
                 <button key={c.id} onClick={()=>{setSel(c);setPhase("brief");setShowRef(false);setShowHints(false);setCreativeTwist(null);setLastTwistId(null);setPanel(null);setPhase2(null);setAiSimDef(null);setTestError("");}}
-                  style={{background:"#fff",border:"2px solid #e2e8f0",borderRadius:9,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.12s"}}
+                  className="soft-panel"
+                  style={{background:"rgba(255,255,255,0.88)",border:"2px solid #e0ebf8",borderRadius:14,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.12s"}}
                   onMouseEnter={e=>{e.currentTarget.style.borderColor=TC[c.type];e.currentTarget.style.transform="translateY(-1px)";}}
-                  onMouseLeave={e=>{e.currentTarget.style.borderColor="#e2e8f0";e.currentTarget.style.transform="none";}}>
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor="#e0ebf8";e.currentTarget.style.transform="none";}}>
                   <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
                     <span style={{fontSize:9,color:DC[c.diff],letterSpacing:3,textTransform:"uppercase",fontWeight:700}}>{c.diff}</span>
                     <span style={{fontSize:9,background:TC[c.type]+"18",color:TC[c.type],border:`1px solid ${TC[c.type]}33`,borderRadius:4,padding:"1px 6px",letterSpacing:1}}>{c.type==="challenge"?"CHALLENGE":"GUIDED"}</span>
@@ -1198,8 +1287,8 @@ export default function App() {
         )}
 
         {phase==="brief" && sel && sel.type!=="sandbox" && (
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-            <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:20}}>
+          <div className="soft-grid-2">
+            <div className="soft-panel" style={{borderRadius:14,padding:20}}>
               {sel.type==="challenge" ? (
                 <>
                   <div style={{fontSize:9,letterSpacing:4,color:"#8b5cf6",textTransform:"uppercase",marginBottom:8,fontWeight:700}}>Design Challenge — {sel.ch}</div>
@@ -1231,7 +1320,7 @@ export default function App() {
               )}
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:20,flex:1}}>
+              <div className="soft-panel" style={{borderRadius:14,padding:20,flex:1}}>
                 <div style={{fontSize:9,letterSpacing:4,color:"#d97706",textTransform:"uppercase",marginBottom:10,fontWeight:700}}>Grading Checkpoints</div>
                 {sel.checkpoints.map((cp,i)=><div key={i} style={{display:"flex",gap:9,marginBottom:8,alignItems:"flex-start"}}><span style={{color:"#e2e8f0",fontSize:13,lineHeight:1.1,flexShrink:0}}>□</span><span style={{fontSize:11,color:"#64748b",lineHeight:1.5}}>{cp}</span></div>)}
               </div>
@@ -1275,7 +1364,7 @@ export default function App() {
         {phase==="draw" && sel && (
           <div style={{display:"flex",flexDirection:"column",gap:10,position:"relative"}}>
             {/* Top bar */}
-            <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:9,padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:6}}>
+            <div className="soft-panel" style={{borderRadius:14,padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:6}}>
               <div>
                 <span style={{fontSize:9,color:DC[sel.diff],letterSpacing:3,textTransform:"uppercase",fontWeight:700,marginRight:10}}>{sel.diff}</span>
                 <span style={{fontSize:14,fontWeight:700,color:"#0f172a"}}>{sel.name}</span>
@@ -1316,7 +1405,7 @@ export default function App() {
             </div>
             {/* Slide-in panel — overlays the canvas without navigating away */}
             {panel && (
-              <div style={{position:"absolute",top:52,right:0,width:"min(420px,95%)",maxHeight:"75vh",overflowY:"auto",background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:18,zIndex:100,boxShadow:"0 8px 32px rgba(0,0,0,0.14)"}}>
+              <div className="soft-panel" style={{position:"absolute",top:52,right:0,width:"min(420px,95%)",maxHeight:"75vh",overflowY:"auto",borderRadius:14,padding:18,zIndex:100,boxShadow:"0 14px 34px rgba(77,96,131,0.2)"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
                   <span style={{fontSize:11,fontWeight:700,color:"#0f172a",letterSpacing:1}}>
                       {panel==="brief"?"BRIEF":panel==="ref"?"REFERENCE DIAGRAM":panel==="hints"?"HINTS":"CREATIVE TWIST"}
@@ -1355,7 +1444,7 @@ export default function App() {
               </div>
             )}
             {phase2==="sim-loading" && (
-              <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:40,textAlign:"center"}}>
+              <div className="soft-panel" style={{borderRadius:14,padding:40,textAlign:"center"}}>
                 <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
                 <div style={{width:36,height:36,border:"3px solid #e2e8f0",borderTop:"3px solid #0f766e",borderRadius:"50%",margin:"0 auto 16px",animation:"spin 0.8s linear infinite"}}/>
                 <div style={{fontSize:13,color:"#475569",fontFamily:"'Courier New',monospace",letterSpacing:1}}>READING YOUR CIRCUIT...</div>
@@ -1388,8 +1477,8 @@ export default function App() {
         )}
 
         {phase==="feedback" && sel && (
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-            <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:14}}>
+          <div className="soft-grid-2">
+            <div className="soft-panel" style={{borderRadius:14,padding:14}}>
               <div style={{fontSize:9,letterSpacing:4,color:"#94a3b8",textTransform:"uppercase",marginBottom:9}}>Your Drawing</div>
               {drawn&&<img src={drawn} alt="drawing" style={{width:"100%",borderRadius:7,border:"1px solid #e5e7eb"}}/>}
               <div style={{display:"flex",gap:7,marginTop:10}}>
@@ -1397,7 +1486,7 @@ export default function App() {
                 <button onClick={reset} style={{flex:1,background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,color:"#64748b",padding:"9px",cursor:"pointer",fontSize:10,letterSpacing:1,fontFamily:"'Courier New',monospace"}}>NEW CIRCUIT</button>
               </div>
             </div>
-            <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:18}}>
+            <div className="soft-panel" style={{borderRadius:14,padding:18}}>
               <div style={{fontSize:9,letterSpacing:4,color:"#1d4ed8",textTransform:"uppercase",marginBottom:10,fontWeight:700}}>Instructor Feedback</div>
               {loading ? (
                 <div style={{display:"flex",flexDirection:"column",gap:9,marginTop:14}}>
