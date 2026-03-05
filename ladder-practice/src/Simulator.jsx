@@ -643,6 +643,23 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
 
   const handleReset = () => setInputState(buildInitialState());
 
+  // Track which momentary buttons are held — release on window mouseup/touchend
+  const heldRef = useRef(null);
+  useEffect(() => {
+    const release = () => {
+      if (heldRef.current) {
+        setInputState(p => ({...p, [heldRef.current]: false}));
+        heldRef.current = null;
+      }
+    };
+    window.addEventListener("mouseup", release);
+    window.addEventListener("touchend", release);
+    return () => {
+      window.removeEventListener("mouseup", release);
+      window.removeEventListener("touchend", release);
+    };
+  }, []);
+
   // Early return AFTER all hooks
   if (!simDef) {
     return (
@@ -674,23 +691,6 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
     if (def.type === "pb_nc") return active ? "PRESSED" : "RELEASED";
     return active ? "ON / TRIPPED" : "OFF / CLEAR";
   };
-
-  // Track which momentary buttons are held — release on window mouseup/touchend
-  const heldRef = useRef(null);
-  useEffect(() => {
-    const release = () => {
-      if (heldRef.current) {
-        setInputState(p => ({...p, [heldRef.current]: false}));
-        heldRef.current = null;
-      }
-    };
-    window.addEventListener("mouseup", release);
-    window.addEventListener("touchend", release);
-    return () => {
-      window.removeEventListener("mouseup", release);
-      window.removeEventListener("touchend", release);
-    };
-  }, []);
 
   return (
     <div style={{display:"flex",flexDirection:"column",gap:12,fontFamily:"'Courier New',monospace"}}>
