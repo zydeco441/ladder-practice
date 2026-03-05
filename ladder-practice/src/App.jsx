@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import Simulator from "./Simulator";
+import packageJson from "../package.json";
 
 const F = "#111";
 const S = 1.5;
@@ -734,6 +735,7 @@ export default function App() {
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
             {sel && phase!=="select" && <button onClick={reset} style={{background:"none",border:"1px solid #334155",borderRadius:5,color:"#64748b",cursor:"pointer",fontSize:10,padding:"5px 12px",letterSpacing:2}}>← ALL</button>}
             <button onClick={clearKey} title="Change API Key" style={{background:"none",border:"1px solid #334155",borderRadius:5,color:"#475569",cursor:"pointer",fontSize:11,padding:"5px 10px"}}>🔑 API Key</button>
+            <div style={{color:"#64748b",fontSize:10,letterSpacing:1,paddingLeft:8,borderLeft:"1px solid #334155"}}>v{packageJson.version}</div>
           </div>
         </div>
 
