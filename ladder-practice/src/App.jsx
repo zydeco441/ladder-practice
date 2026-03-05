@@ -112,6 +112,139 @@ function EStop({ x, y }) {
     </g>
   );
 }
+
+function SymbolIcon({ symbol }) {
+  const y = 18;
+  const lx = 20;
+  const rx = 44;
+  const wireL = 8;
+  const wireR = 56;
+  const stroke = { stroke: F, strokeWidth: 1.8, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" };
+
+  const baseWires = (
+    <>
+      <line x1={wireL} y1={y} x2={lx} y2={y} {...stroke}/>
+      <circle cx={lx} cy={y} r="2.2" fill={F}/>
+      <circle cx={rx} cy={y} r="2.2" fill={F}/>
+      <line x1={rx} y1={y} x2={wireR} y2={y} {...stroke}/>
+    </>
+  );
+
+  const icon = (() => {
+    switch (symbol) {
+      case "NO Contact":
+        return (
+          <>
+            {baseWires}
+            <line x1={lx} y1={y-8} x2={lx} y2={y+8} {...stroke}/>
+            <line x1={rx} y1={y-8} x2={rx} y2={y+8} {...stroke}/>
+          </>
+        );
+      case "NC Contact":
+        return (
+          <>
+            {baseWires}
+            <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
+            <line x1={lx-3} y1={y+7} x2={rx+3} y2={y-7} {...stroke}/>
+          </>
+        );
+      case "NO Pushbutton":
+        return (
+          <>
+            {baseWires}
+            <line x1={lx-2} y1={y-7} x2={rx+2} y2={y-7} {...stroke}/>
+            <line x1={32} y1={y-7} x2={32} y2={y-2} {...stroke}/>
+          </>
+        );
+      case "NC Pushbutton":
+        return (
+          <>
+            {baseWires}
+            <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
+            <line x1={lx-2} y1={y+7} x2={rx+2} y2={y+7} {...stroke}/>
+            <line x1={32} y1={y+2} x2={32} y2={y+7} {...stroke}/>
+          </>
+        );
+      case "Coil":
+        return (
+          <>
+            <line x1={wireL} y1={y} x2={18} y2={y} {...stroke}/>
+            <circle cx={33} cy={y} r="11" {...stroke}/>
+            <text x="33" y="21" textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial" fontWeight="bold">CR</text>
+            <line x1={44} y1={y} x2={wireR} y2={y} {...stroke}/>
+          </>
+        );
+      case "Solenoid":
+        return (
+          <>
+            <line x1={wireL} y1={y} x2={14} y2={y} {...stroke}/>
+            <polyline points="14,18 19,12 24,24 29,12 34,24 39,18" {...stroke}/>
+            <circle cx="40" cy="18" r="2.2" fill={F}/>
+            <line x1={40} y1={y} x2={wireR} y2={y} {...stroke}/>
+          </>
+        );
+      case "Pilot Light":
+        return (
+          <>
+            <line x1={wireL} y1={y} x2={18} y2={y} {...stroke}/>
+            <circle cx={33} cy={y} r="10" {...stroke}/>
+            <line x1="24" y1="9" x2="20" y2="5" {...stroke}/>
+            <line x1="42" y1="9" x2="46" y2="5" {...stroke}/>
+            <line x1="24" y1="27" x2="20" y2="31" {...stroke}/>
+            <line x1="42" y1="27" x2="46" y2="31" {...stroke}/>
+            <text x="33" y="21" textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial">L</text>
+            <line x1={44} y1={y} x2={wireR} y2={y} {...stroke}/>
+          </>
+        );
+      case "Timer":
+        return (
+          <>
+            <line x1={wireL} y1={y} x2={18} y2={y} {...stroke}/>
+            <circle cx={33} cy={y} r="11" {...stroke}/>
+            <text x="33" y="21" textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial" fontWeight="bold">TR</text>
+            <line x1={44} y1={y} x2={wireR} y2={y} {...stroke}/>
+          </>
+        );
+      case "NO Limit Switch":
+        return (
+          <>
+            {baseWires}
+            <circle cx="14" cy="13" r="1.7" {...stroke}/>
+            <polygon points="16,16 20,12 20,20" {...stroke}/>
+            <line x1="21" y1="16" x2="39" y2="22" {...stroke}/>
+          </>
+        );
+      case "NC Limit Switch":
+        return (
+          <>
+            {baseWires}
+            <circle cx="14" cy="13" r="1.7" {...stroke}/>
+            <polygon points="16,16 20,12 20,20" {...stroke}/>
+            <line x1="21" y1="16" x2="44" y2="18" {...stroke}/>
+            <line x1="41" y1="20" x2="44" y2="18" {...stroke}/>
+          </>
+        );
+      case "E-STOP":
+        return (
+          <>
+            {baseWires}
+            <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
+            <path d="M22 18 Q32 1 42 18" {...stroke}/>
+            <line x1="32" y1="9" x2="32" y2="17" {...stroke}/>
+          </>
+        );
+      default:
+        return null;
+    }
+  })();
+
+  return (
+    <svg width="72" height="34" viewBox="0 0 64 34" aria-hidden="true">
+      {icon}
+    </svg>
+  );
+}
+
 function W({ x1, y1, x2, y2 }) { return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={F} strokeWidth={S}/>; }
 function Dot({ x, y }) { return <circle cx={x} cy={y} r="2.8" fill={F}/>; }
 function Rails({ L1, L2, y1, y2 }) {
@@ -455,8 +588,58 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
     for(let y=0;y<h;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
   };
 
+  const drawNode = (ctx, x, y, r = 3) => {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fill();
+  };
+
+  const drawPushbutton = (ctx, x, y, isNC) => {
+    const lx = x - 10;
+    const rx = x + 10;
+    ctx.beginPath(); ctx.moveTo(x-24, y); ctx.lineTo(lx, y); ctx.stroke();
+    drawNode(ctx, lx, y);
+    drawNode(ctx, rx, y);
+    if (isNC) {
+      ctx.beginPath(); ctx.moveTo(lx, y); ctx.lineTo(rx, y); ctx.stroke();
+    }
+    const barY = isNC ? y + 7 : y - 7;
+    ctx.beginPath(); ctx.moveTo(lx-2, barY); ctx.lineTo(rx+2, barY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, barY); ctx.lineTo(x, isNC ? y + 2 : y - 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(rx, y); ctx.lineTo(x+24, y); ctx.stroke();
+  };
+
+  const drawLimitSwitch = (ctx, x, y, isNC) => {
+    const lx = x - 10;
+    const rx = x + 10;
+    ctx.beginPath(); ctx.moveTo(x-24, y); ctx.lineTo(lx, y); ctx.stroke();
+    drawNode(ctx, lx, y);
+    drawNode(ctx, rx, y);
+    ctx.beginPath();
+    ctx.arc(lx-6, y-4, 1.8, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(lx-4, y-1);
+    ctx.lineTo(lx, y-5);
+    ctx.lineTo(lx, y+3);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(lx+1, y-2);
+    ctx.lineTo(isNC ? rx : rx-4, y+3);
+    ctx.stroke();
+    if (isNC) {
+      ctx.beginPath();
+      ctx.moveTo(rx-2, y+3);
+      ctx.lineTo(rx+1, y+1);
+      ctx.stroke();
+    }
+    ctx.beginPath(); ctx.moveTo(rx, y); ctx.lineTo(x+24, y); ctx.stroke();
+  };
+
   const drawSymbol = (ctx, symbolName, x, y) => {
     ctx.strokeStyle="#111"; ctx.lineWidth=2.5; ctx.fillStyle="#111";
+    ctx.lineCap="round"; ctx.lineJoin="round";
     const s = 24;
     switch(symbolName) {
       case "NO Contact":
@@ -468,31 +651,18 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "NC Contact":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x-10, y-9); ctx.lineTo(x-10, y+9); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+10, y-9); ctx.lineTo(x+10, y+9); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-2, y+7); ctx.lineTo(x+18, y-7); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        drawNode(ctx, x-10, y);
+        drawNode(ctx, x+10, y);
+        ctx.beginPath(); ctx.moveTo(x-10, y); ctx.lineTo(x+10, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-13, y+7); ctx.lineTo(x+13, y-7); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "NO Pushbutton":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x-10, y-8); ctx.lineTo(x-2, y-8); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-6, y-8); ctx.lineTo(x-6, y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+10, y-8); ctx.lineTo(x+2, y-8); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        drawPushbutton(ctx, x, y, false);
         break;
       case "NC Pushbutton":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x-10, y+8); ctx.lineTo(x-2, y+8); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-6, y+8); ctx.lineTo(x-6, y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+10, y+8); ctx.lineTo(x+2, y+8); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        drawPushbutton(ctx, x, y, true);
         break;
       case "Coil":
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
@@ -501,16 +671,17 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Solenoid":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        for(let i=0; i<5; i++) {
-          const xp = x-10+i*5;
-          ctx.beginPath();
-          if(i % 2 === 0) ctx.moveTo(xp, y-6);
-          else ctx.moveTo(xp, y+6);
-          ctx.lineTo(xp+2.5, y+(i%2===0?6:-6));
-          ctx.stroke();
-        }
-        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-14, y); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x-14, y);
+        ctx.lineTo(x-9, y-6);
+        ctx.lineTo(x-4, y+6);
+        ctx.lineTo(x+1, y-6);
+        ctx.lineTo(x+6, y+6);
+        ctx.lineTo(x+10, y);
+        ctx.stroke();
+        drawNode(ctx, x+10, y);
+        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Pilot Light":
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
@@ -531,33 +702,22 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "NO Limit Switch":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x-10, y); ctx.lineTo(x-10, y+12); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-10, y+12); ctx.lineTo(x-6, y+18); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-4, y+16); ctx.lineTo(x-8, y+20); ctx.lineTo(x-10, y+16); ctx.closePath(); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        drawLimitSwitch(ctx, x, y, false);
         break;
       case "NC Limit Switch":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x-10, y); ctx.lineTo(x-10, y+12); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-10, y+12); ctx.lineTo(x-6, y+18); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-4, y+16); ctx.lineTo(x-8, y+20); ctx.lineTo(x-10, y+16); ctx.closePath(); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+10, y+12); ctx.lineTo(x+6, y+18); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        drawLimitSwitch(ctx, x, y, true);
         break;
       case "E-STOP":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+6, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle="#dc2626"; ctx.beginPath(); ctx.arc(x+6, y-9, 8, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle="#111";
-        ctx.beginPath(); ctx.moveTo(x+6, y-8); ctx.lineTo(x+6, y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+6, y); ctx.lineTo(x+16, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+18, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s+4, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-8, y); ctx.stroke();
+        drawNode(ctx, x-8, y);
+        drawNode(ctx, x+12, y);
+        ctx.beginPath(); ctx.moveTo(x-8, y); ctx.lineTo(x+12, y); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x-8, y);
+        ctx.quadraticCurveTo(x+2, y-17, x+12, y);
+        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+2, y-9); ctx.lineTo(x+2, y-1); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s+4, y); ctx.stroke();
         break;
       default: break;
     }
@@ -717,10 +877,13 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,fontSize:9}}>
             {["NO Contact","NC Contact","NO Pushbutton","NC Pushbutton","Coil","Solenoid","Pilot Light","Timer","NO Limit Switch","NC Limit Switch","E-STOP"].map(sym=>(
               <div key={sym} onClick={()=>handleSymbolClick(sym)} style={{padding:8,background:symbolMode===sym?"#dbeafe":"#fff",border:"1px solid "+(symbolMode===sym?"#0284c7":"#e2e8f0"),borderRadius:4,cursor:"pointer",transition:"0.2s"}}
-                onMouseEnter={(e)=>{if(symbolMode!==sym)e.target.style.background="#f0f9ff";}}
-                onMouseLeave={(e)=>{e.target.style.background=symbolMode===sym?"#dbeafe":"#fff";}}>
-                <strong style={{color:symbolMode===sym?"#0284c7":"#334155"}}>{sym}</strong>
-                <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>{symbolMode===sym?"Click canvas to place →":""}</div>
+                onMouseEnter={(e)=>{if(symbolMode!==sym)e.currentTarget.style.background="#f0f9ff";}}
+                onMouseLeave={(e)=>{e.currentTarget.style.background=symbolMode===sym?"#dbeafe":"#fff";}}>
+                <div style={{display:"flex",justifyContent:"center",marginBottom:2}}>
+                  <SymbolIcon symbol={sym}/>
+                </div>
+                <strong style={{color:symbolMode===sym?"#0284c7":"#334155",display:"block",textAlign:"center"}}>{sym}</strong>
+                <div style={{fontSize:8,color:"#94a3b8",marginTop:4,textAlign:"center"}}>{symbolMode===sym?"Click canvas to place ->":""}</div>
               </div>
             ))}
           </div>
