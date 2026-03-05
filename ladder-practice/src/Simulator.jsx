@@ -333,7 +333,6 @@ function RungSVG({ rung, inputState, coils, coilDefs, onToggle, powered }) {
   const items = flattenRung(rung.series);
   const totalW = items.length * 56 + 80;
   const W = Math.max(totalW, 320);
-  const railR = W - PAD;
   const midY = H / 2 + 8;
 
   const wire = powered ? POWERED : DEAD;
