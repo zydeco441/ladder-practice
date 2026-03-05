@@ -741,7 +741,7 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
       <div style={{display:"flex",gap:10}}>
         <button onClick={()=>{commitText();onSubmit(ref.current.toDataURL("image/png"));}}
           style={{flex:1,background:"#1d4ed8",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
-          SUBMIT FOR GRADING →
+          CHECK FOR MISTAKES →
         </button>
         <button onClick={()=>{commitText();onTest(ref.current.toDataURL("image/png"));}}
           style={{flex:1,background:"#0f766e",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
@@ -1046,7 +1046,9 @@ export default function App() {
                 onClose={()=>{if(sel?.type==="sandbox"){setPhase("draw")}setPhase2(null);setAiSimDef(null);}}
               />
             )}
-            {phase2!=="sim" && phase2!=="sim-loading" && <Canvas onSubmit={grade} onTest={testCircuit} isSandbox={sel.type==="sandbox"}/>}
+            <div style={{display: phase2==="sim" || phase2==="sim-loading" ? "none" : "block"}}>
+              <Canvas onSubmit={grade} onTest={testCircuit} isSandbox={sel.type==="sandbox"}/>
+            </div>
           </div>
         )}
 
