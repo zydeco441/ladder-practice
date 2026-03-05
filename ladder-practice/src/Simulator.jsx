@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 // ═══════════════════════════════════════════════════════════════════
 // CIRCUIT LOGIC DEFINITIONS
@@ -327,57 +327,144 @@ const POWERED = "#f59e0b";
 const DEAD    = "#94a3b8";
 const INK     = "#1e293b";
 
+// Calculate how many "slots" an element takes up horizontally
+function elementWidth(el) {
+  if (el.type === "PARALLEL") {
+    const branchW = el.branches.map(b => b.reduce((s, e) => s + elementWidth(e), 0));
+    return Math.max(...branchW);
+  }
+  return 1;
+}
+
+// Calculate total slots for a series
+function seriesWidth(series) {
+  return series.reduce((s, e) => s + elementWidth(e), 0);
+}
+
+const SLOT = 58; // px per contact slot
+const PAD  = 22;
+const COIL_W = 36;
+
 function RungSVG({ rung, inputState, coils, coilDefs, onToggle, powered }) {
-  const H = 54, PAD = 18;
-  // Build flat list of elements with x positions
-  const items = flattenRung(rung.series);
-  const totalW = items.length * 56 + 80;
-  const W = Math.max(totalW, 320);
-  const midY = H / 2 + 8;
+  const totalSlots = seriesWidth(rung.series);
+  const W = Math.max(PAD + totalSlots * SLOT + COIL_W + PAD + 20, 340);
+
+  // Height: need room for parallel branches
+  // Find max parallel branches in this rung
+  let maxBranches = 1;
+  for (const el of rung.series) {
+    if (el.type === "PARALLEL") maxBranches = Math.max(maxBranches, el.branches.length);
+  }
+  const BRANCH_H = 46;
+  const H = Math.max(60, maxBranches * BRANCH_H + 20);
+  const midY = maxBranches === 1 ? H / 2 + 4 : BRANCH_H / 2 + 10;
 
   const wire = powered ? POWERED : DEAD;
+  const coilX = PAD + totalSlots * SLOT + 4;
 
   return (
-    <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{display:"block",overflow:"visible"}}>
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{display:"block",overflow:"visible",marginBottom:2}}>
       {/* Left rail */}
       <line x1={PAD} y1={4} x2={PAD} y2={H-4} stroke={wire} strokeWidth="3"/>
-      {/* Main wire */}
-      <line x1={PAD} y1={midY} x2={W-PAD-32} y2={midY} stroke={wire} strokeWidth="2"/>
-      {/* Elements */}
-      {items.map((item, i) => {
-        const x = PAD + 16 + i * 56;
-        return (
-          <ElementSVG key={i} el={item} x={x} y={midY} inputState={inputState}
-            coils={coils} powered={powered} onToggle={onToggle}/>
-        );
-      })}
+      {/* Right rail stub */}
+      <line x1={W-PAD} y1={4} x2={W-PAD} y2={H-4} stroke={wire} strokeWidth="3"/>
+      {/* Render series elements */}
+      <SeriesSVG
+        series={rung.series}
+        x0={PAD}
+        y={midY}
+        H={H}
+        inputState={inputState}
+        coils={coils}
+        powered={powered}
+        onToggle={onToggle}
+      />
+      {/* Wire from last element to coil */}
+      <line x1={coilX} y1={midY} x2={coilX+4} y2={midY} stroke={wire} strokeWidth="2"/>
       {/* Output coils */}
       {rung.outputs.map((outId, i) => {
         const def = coilDefs[outId] || {label:outId, type:"relay"};
-        const cx = W - PAD - 28;
-        const cy = midY + i * 22;
         return (
-          <CoilSVG key={outId} x={cx} y={cy} def={def} energized={coils[outId]}/>
+          <CoilSVG key={outId} x={coilX+4} y={midY + i*26} def={def} energized={coils[outId]}/>
         );
       })}
+      {/* Wire from coil to right rail */}
+      <line x1={coilX+36} y1={midY} x2={W-PAD} y2={midY} stroke={wire} strokeWidth="2"/>
     </svg>
   );
 }
 
-function flattenRung(series) {
-  const out = [];
-  for (const el of series) {
+// Renders a series of elements starting at x0, returns end x
+function SeriesSVG({ series, x0, y, H, inputState, coils, powered, onToggle }) {
+  let x = x0;
+  const els = [];
+  for (let i = 0; i < series.length; i++) {
+    const el = series[i];
+    const w = elementWidth(el) * SLOT;
     if (el.type === "PARALLEL") {
-      // For display, show the parallel branches flattened with a "/" separator
-      for (let bi = 0; bi < el.branches.length; bi++) {
-        for (const sub of el.branches[bi]) out.push({...sub, _parallel:true, _branchIdx:bi, _parentParallel:el});
-        if (bi < el.branches.length - 1) out.push({type:"_PAR_SEP"});
-      }
+      els.push(
+        <ParallelSVG key={i} el={el} x={x} y={y} H={H}
+          inputState={inputState} coils={coils} powered={powered} onToggle={onToggle}/>
+      );
     } else {
-      out.push(el);
+      // Wire before contact
+      els.push(<line key={`w${i}`} x1={x} y1={y} x2={x+8} y2={y} stroke={powered?POWERED:DEAD} strokeWidth="2"/>);
+      els.push(
+        <ElementSVG key={`e${i}`} el={el} x={x+8} y={y}
+          inputState={inputState} coils={coils} powered={powered} onToggle={onToggle}/>
+      );
     }
+    x += w;
   }
-  return out;
+  // Final wire segment
+  els.push(<line key="wfinal" x1={x} y1={y} x2={x} y2={y} stroke={powered?POWERED:DEAD} strokeWidth="2"/>);
+  return <>{els}</>;
+}
+
+// Renders a PARALLEL element: draws each branch stacked vertically with vertical connector lines
+function ParallelSVG({ el, x, y, H, inputState, coils, powered, onToggle }) {
+  const branches = el.branches;
+  const nBranches = branches.length;
+  const BRANCH_H = 46;
+  const totalH = nBranches * BRANCH_H;
+  const startY = y - (totalH / 2) + BRANCH_H / 2;
+  const maxW = Math.max(...branches.map(b => seriesWidth(b))) * SLOT;
+
+  const els = [];
+
+  // Left vertical connector
+  els.push(<line key="lv" x1={x+4} y1={startY} x2={x+4} y2={startY+(nBranches-1)*BRANCH_H} stroke={powered?POWERED:DEAD} strokeWidth="1.5"/>);
+  // Right vertical connector
+  els.push(<line key="rv" x1={x+maxW+4} y1={startY} x2={x+maxW+4} y2={startY+(nBranches-1)*BRANCH_H} stroke={powered?POWERED:DEAD} strokeWidth="1.5"/>);
+
+  branches.forEach((branch, bi) => {
+    const by = startY + bi * BRANCH_H;
+    const bw = seriesWidth(branch) * SLOT;
+    const bPowered = powered && evalSeries(branch, inputState, coils);
+    const wire = bPowered ? POWERED : DEAD;
+
+    // Horizontal wire from left connector to first element
+    els.push(<line key={`bl${bi}`} x1={x+4} y1={by} x2={x+12} y2={by} stroke={wire} strokeWidth="2"/>);
+
+    // Elements in this branch
+    let bx = x + 12;
+    branch.forEach((bel, bei) => {
+      els.push(<line key={`bw${bi}-${bei}`} x1={bx} y1={by} x2={bx+4} y2={by} stroke={wire} strokeWidth="2"/>);
+      els.push(
+        <ElementSVG key={`be${bi}-${bei}`} el={bel} x={bx+4} y={by}
+          inputState={inputState} coils={coils} powered={bPowered} onToggle={onToggle}/>
+      );
+      bx += elementWidth(bel) * SLOT;
+    });
+
+    // Wire from last element to right connector
+    els.push(<line key={`br${bi}`} x1={bx} y1={by} x2={x+maxW+4} y2={by} stroke={wire} strokeWidth="2"/>);
+  });
+
+  // Wire out from right connector to next element
+  els.push(<line key="rout" x1={x+maxW+4} y1={y} x2={x+maxW+SLOT} y2={y} stroke={powered?POWERED:DEAD} strokeWidth="2"/>);
+
+  return <>{els}</>;
 }
 
 function ElementSVG({ el, x, y, inputState, coils, powered, onToggle }) {
@@ -588,6 +675,23 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
     return active ? "ON / TRIPPED" : "OFF / CLEAR";
   };
 
+  // Track which momentary buttons are held — release on window mouseup/touchend
+  const heldRef = useRef(null);
+  useEffect(() => {
+    const release = () => {
+      if (heldRef.current) {
+        setInputState(p => ({...p, [heldRef.current]: false}));
+        heldRef.current = null;
+      }
+    };
+    window.addEventListener("mouseup", release);
+    window.addEventListener("touchend", release);
+    return () => {
+      window.removeEventListener("mouseup", release);
+      window.removeEventListener("touchend", release);
+    };
+  }, []);
+
   return (
     <div style={{display:"flex",flexDirection:"column",gap:12,fontFamily:"'Courier New',monospace"}}>
       {/* Header */}
@@ -646,10 +750,9 @@ export default function Simulator({ circuit, circuitId, simDef: simDefProp, onCl
                 <div key={id} style={{marginBottom:8}}>
                   <div style={{fontSize:10,color:"#475569",marginBottom:4}}>{def.label}</div>
                   <button
-                    onClick={()=>handleToggle(id, def.type)}
-                    onMouseDown={isPB ? ()=>setInputState(p=>({...p,[id]:true})) : undefined}
-                    onMouseUp={isPB ? ()=>setInputState(p=>({...p,[id]:false})) : undefined}
-                    onMouseLeave={isPB ? ()=>setInputState(p=>({...p,[id]:false})) : undefined}
+                    onClick={!isPB ? ()=>handleToggle(id, def.type) : undefined}
+                    onMouseDown={isPB ? ()=>{ heldRef.current=id; setInputState(p=>({...p,[id]:true})); } : undefined}
+                    onTouchStart={isPB ? (e)=>{ e.preventDefault(); heldRef.current=id; setInputState(p=>({...p,[id]:true})); } : undefined}
                     style={{
                       width:"100%",
                       padding:"8px 10px",
