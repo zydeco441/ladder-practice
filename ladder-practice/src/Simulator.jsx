@@ -509,18 +509,9 @@ function CoilSVG({ x, y, def, energized }) {
 export default function Simulator({ circuit, circuitId, onClose }) {
   const simDef = SIM_CIRCUITS[circuitId];
 
-  if (!simDef) {
-    return (
-      <div style={{background:"#fff",borderRadius:10,padding:28,textAlign:"center",border:"1px solid #e2e8f0"}}>
-        <div style={{fontSize:13,color:"#64748b",marginBottom:12}}>Simulator not available for this circuit yet.</div>
-        <div style={{fontSize:11,color:"#94a3b8",marginBottom:16}}>Available for: Start/Stop, Two Lights, Single-Acting Cylinder, Jogging, Forward/Reverse, Double-Acting Cylinder.</div>
-        <button onClick={onClose} style={{background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,padding:"8px 20px",cursor:"pointer",fontSize:12,fontFamily:"'Courier New',monospace",color:"#64748b"}}>← BACK</button>
-      </div>
-    );
-  }
-
-  // Build initial input state from defaults
+  // Build initial input state from defaults — must come before any early return
   const buildInitialState = useCallback(() => {
+    if (!simDef) return {};
     const s = {};
     for (const [id, def] of Object.entries(simDef.inputs)) {
       if (def.type === "estop") s[id] = true; // E-STOP closed by default
@@ -565,6 +556,17 @@ export default function Simulator({ circuit, circuitId, onClose }) {
   };
 
   const handleReset = () => setInputState(buildInitialState());
+
+  // Early return AFTER all hooks
+  if (!simDef) {
+    return (
+      <div style={{background:"#fff",borderRadius:10,padding:28,textAlign:"center",border:"1px solid #e2e8f0"}}>
+        <div style={{fontSize:13,color:"#64748b",marginBottom:12}}>Simulator not available for this circuit yet.</div>
+        <div style={{fontSize:11,color:"#94a3b8",marginBottom:16}}>Available for: Start/Stop, Two Lights, Single-Acting Cylinder, Jogging, Forward/Reverse, Double-Acting Cylinder.</div>
+        <button onClick={onClose} style={{background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:7,padding:"8px 20px",cursor:"pointer",fontSize:12,fontFamily:"'Courier New',monospace",color:"#64748b"}}>← BACK</button>
+      </div>
+    );
+  }
 
   // Determine which rungs are powered
   const getRungPowered = (rung) => {
