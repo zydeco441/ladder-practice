@@ -713,6 +713,7 @@ export default function App() {
     }
   };
 
+  const reset = () => { setSel(null); setPhase("select"); setPhase2(null); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); setPanel(null); setAiSimDef(null); setTestError(""); };
   const clearKey = () => { localStorage.removeItem("anthropic_api_key"); setApiKey(""); };
 
   const filters = ["All","Beginner","Intermediate","Advanced","Challenges"];
