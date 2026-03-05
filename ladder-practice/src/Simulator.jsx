@@ -505,8 +505,8 @@ function CoilSVG({ x, y, def, energized }) {
 // ═══════════════════════════════════════════════════════════════════
 // MAIN SIMULATOR COMPONENT
 // ═══════════════════════════════════════════════════════════════════
-export default function Simulator({ circuit, circuitId, onClose }) {
-  const simDef = SIM_CIRCUITS[circuitId];
+export default function Simulator({ circuit, circuitId, simDef: simDefProp, onClose }) {
+  const simDef = simDefProp || SIM_CIRCUITS[circuitId];
 
   // Build initial input state from defaults — must come before any early return
   const buildInitialState = useCallback(() => {
