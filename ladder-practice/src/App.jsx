@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Simulator from "./Simulator";
 
 const F = "#111";
 const S = 1.5;
@@ -621,6 +622,7 @@ export default function App() {
   const [showHints, setShowHints] = useState(false);
   const [filter, setFilter] = useState("All");
   const [panel, setPanel] = useState(null);
+  const [phase2, setPhase2] = useState(null); // null | "sim"
 
   if (!apiKey) return <ApiKeyScreen onSave={setApiKey}/>;
 
@@ -653,7 +655,7 @@ export default function App() {
     setLoading(false);
   };
 
-  const reset = () => { setSel(null); setPhase("select"); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); setPanel(null); };
+  const reset = () => { setSel(null); setPhase("select"); setPhase2(null); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); setPanel(null); };
   const clearKey = () => { localStorage.removeItem("anthropic_api_key"); setApiKey(""); };
 
   const filters = ["All","Beginner","Intermediate","Advanced","Challenges"];
@@ -745,6 +747,9 @@ export default function App() {
               <button onClick={()=>setPhase("draw")} style={{background:sel.type==="challenge"?"#7c3aed":"#1d4ed8",border:"none",borderRadius:9,color:"#fff",padding:"15px",cursor:"pointer",fontSize:13,fontFamily:"'Courier New',monospace",letterSpacing:3,fontWeight:700}}>
                 START DRAWING →
               </button>
+              <button onClick={()=>{setPhase("draw");setPhase2("sim");}} style={{background:"#0f766e",border:"none",borderRadius:9,color:"#fff",padding:"12px",cursor:"pointer",fontSize:12,fontFamily:"'Courier New',monospace",letterSpacing:2,fontWeight:700}}>
+                ⚡ SIMULATE CIRCUIT
+              </button>
             </div>
           </div>
         )}
@@ -760,6 +765,9 @@ export default function App() {
               <div style={{display:"flex",gap:7}}>
                 <button onClick={()=>setPanel(panel==="brief"?null:"brief")} style={{background:panel==="brief"?"#1e293b":"none",color:panel==="brief"?"#fff":"#64748b",border:"1px solid #e2e8f0",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace"}}>
                   📋 BRIEF
+                </button>
+                <button onClick={()=>setPhase2(phase2==="sim"?null:"sim")} style={{background:phase2==="sim"?"#0f766e":"#f0fdf4",color:phase2==="sim"?"#fff":"#0f766e",border:"1px solid #99f6e4",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace",fontWeight:700}}>
+                  ⚡ SIM
                 </button>
                 {sel.type==="guided"&&sel.diagram&&(
                   <button onClick={()=>setPanel(panel==="ref"?null:"ref")} style={{background:panel==="ref"?"#1e293b":"#f1f5f9",color:panel==="ref"?"#fff":"#64748b",border:"1px solid #e2e8f0",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px"}}>
@@ -806,7 +814,8 @@ export default function App() {
                 )}
               </div>
             )}
-            <Canvas onSubmit={grade}/>
+            {phase2==="sim" && <Simulator circuit={sel} circuitId={sel.id} onClose={()=>setPhase2(null)}/>}
+            {phase2!=="sim" && <Canvas onSubmit={grade}/>}
           </div>
         )}
 
