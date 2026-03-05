@@ -503,6 +503,80 @@ const CIRCUITS = [
 const DC = { Beginner:"#16a34a", Intermediate:"#d97706", Advanced:"#dc2626" };
 const TC = { guided:"#3b82f6", challenge:"#8b5cf6" };
 
+const CREATIVE_TWISTS = [
+  {
+    id: "fault-annunciator",
+    levels: ["Beginner", "Intermediate", "Advanced"],
+    types: ["guided", "challenge"],
+    title: "Fault Annunciator",
+    prompt: "Add a red FAULT light that turns on whenever a stop condition is active (E-STOP, STOP, or overload/fault input).",
+  },
+  {
+    id: "manual-auto-selector",
+    levels: ["Intermediate", "Advanced"],
+    types: ["guided", "challenge"],
+    title: "Manual / Auto Selector",
+    prompt: "Add a selector switch with MANUAL and AUTO modes. MANUAL should be momentary control, AUTO should allow normal latch/sequence behavior.",
+  },
+  {
+    id: "restart-confirm",
+    levels: ["Beginner", "Intermediate", "Advanced"],
+    types: ["guided", "challenge"],
+    title: "Restart Confirm",
+    prompt: "After E-STOP recovery, require a dedicated RESET pushbutton before START can energize outputs again.",
+  },
+  {
+    id: "prestart-delay",
+    levels: ["Intermediate", "Advanced"],
+    types: ["guided", "challenge"],
+    title: "Pre-Start Delay",
+    prompt: "Add a 2-second delay before the primary output (motor/solenoid/light) energizes after START.",
+  },
+  {
+    id: "run-healthy-window",
+    levels: ["Beginner", "Intermediate"],
+    types: ["guided", "challenge"],
+    title: "Healthy Window",
+    prompt: "Show a green RUN light only when all required permissives are healthy and the process is actively running.",
+  },
+  {
+    id: "jam-recovery",
+    levels: ["Intermediate", "Advanced"],
+    types: ["guided", "challenge"],
+    title: "Jam Recovery",
+    prompt: "Add a JAM input that immediately drops outputs and latches an alarm until RESET is pressed.",
+  },
+  {
+    id: "energy-saver",
+    levels: ["Beginner", "Intermediate"],
+    types: ["guided", "challenge"],
+    title: "Energy Saver",
+    prompt: "Add logic so indicator lights and auxiliary coils de-energize automatically after idle timeout, while safety logic remains active.",
+  },
+  {
+    id: "proof-of-home",
+    levels: ["Intermediate", "Advanced"],
+    types: ["guided", "challenge"],
+    title: "Proof-of-Home Start",
+    prompt: "Require a HOME limit switch confirmation before START is allowed to run the cycle.",
+  },
+];
+
+function pickCreativeTwist(circuit, excludeId = null) {
+  if (!circuit || !circuit.diff || !circuit.type) return null;
+
+  const pool = CREATIVE_TWISTS.filter((twist) => {
+    return twist.levels.includes(circuit.diff) && twist.types.includes(circuit.type);
+  });
+
+  if (!pool.length) return null;
+
+  const withoutPrevious = excludeId ? pool.filter((twist) => twist.id !== excludeId) : pool;
+  const options = withoutPrevious.length ? withoutPrevious : pool;
+
+  return options[Math.floor(Math.random() * options.length)];
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // API KEY SCREEN
 // ═══════════════════════════════════════════════════════════════════
@@ -932,6 +1006,15 @@ export default function App() {
   const [phase2, setPhase2] = useState(null); // null | "sim"
   const [aiSimDef, setAiSimDef] = useState(null);   // AI-generated sim definition
   const [testError, setTestError] = useState("");
+  const [creativeTwist, setCreativeTwist] = useState(null);
+  const [lastTwistId, setLastTwistId] = useState(null);
+
+  const rollCreativeTwist = (circuit = sel) => {
+    const picked = pickCreativeTwist(circuit, lastTwistId);
+    if (!picked) return;
+    setCreativeTwist(picked);
+    setLastTwistId(picked.id);
+  };
 
   if (!apiKey) return <ApiKeyScreen onSave={setApiKey}/>;
 
@@ -940,6 +1023,9 @@ export default function App() {
     try {
       const b64 = dataUrl.split(",")[1];
       const isChallenge = sel.type === "challenge";
+      const twistNote = creativeTwist
+        ? `\n\nCreative Twist (bonus objective): ${creativeTwist.title}\n${creativeTwist.prompt}\nIn your feedback, explicitly say "Twist complete" or "Twist not complete". Do not reduce the base score if the core circuit is correct but the twist is not implemented.`
+        : "";
       const res = await fetch("/api/grade", {
         method:"POST",
         headers:{"Content-Type":"application/json","x-api-key":apiKey},
@@ -950,8 +1036,8 @@ export default function App() {
           messages:[{role:"user",content:[
             {type:"image",source:{type:"base64",media_type:"image/png",data:b64}},
             {type:"text",text:isChallenge
-              ?`Design Challenge. Goal: "${sel.goal}"\n\nCheckpoints:\n${sel.checkpoints.map((c,i)=>`${i+1}. ${c}`).join("\n")}\n\nScore out of 10. Praise what they got right. Give 2-4 improvements. Reward creative correct solutions. Flag missing safety elements.`
-              :`Circuit: "${sel.name}" (${sel.ch})\n\nParameters:\n${sel.params.map((p,i)=>`${String.fromCharCode(65+i)}. ${p}`).join("\n")}\n\nCheckpoints:\n${sel.checkpoints.map((c,i)=>`${i+1}. ${c}`).join("\n")}\n\nScore out of 10. Be specific about symbol accuracy and rung structure. Give 2-4 improvements. Note missing safety elements. Be encouraging.`
+              ?`Design Challenge. Goal: "${sel.goal}"\n\nCheckpoints:\n${sel.checkpoints.map((c,i)=>`${i+1}. ${c}`).join("\n")}\n\nScore out of 10. Praise what they got right. Give 2-4 improvements. Reward creative correct solutions. Flag missing safety elements.${twistNote}`
+              :`Circuit: "${sel.name}" (${sel.ch})\n\nParameters:\n${sel.params.map((p,i)=>`${String.fromCharCode(65+i)}. ${p}`).join("\n")}\n\nCheckpoints:\n${sel.checkpoints.map((c,i)=>`${i+1}. ${c}`).join("\n")}\n\nScore out of 10. Be specific about symbol accuracy and rung structure. Give 2-4 improvements. Note missing safety elements. Be encouraging.${twistNote}`
             }
           ]}]
         })
@@ -1014,7 +1100,20 @@ export default function App() {
     }
   };
 
-  const reset = () => { setSel(null); setPhase("select"); setPhase2(null); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); setPanel(null); setAiSimDef(null); setTestError(""); };
+  const reset = () => {
+    setSel(null);
+    setPhase("select");
+    setPhase2(null);
+    setFeedback("");
+    setDrawn(null);
+    setShowRef(false);
+    setShowHints(false);
+    setPanel(null);
+    setAiSimDef(null);
+    setTestError("");
+    setCreativeTwist(null);
+    setLastTwistId(null);
+  };
   const clearKey = () => { localStorage.removeItem("anthropic_api_key"); setApiKey(""); };
 
   const filters = ["All","Beginner","Intermediate","Advanced","Challenges"];
@@ -1023,6 +1122,24 @@ export default function App() {
     if(filter==="Challenges") return c.type==="challenge";
     return c.diff===filter;
   });
+
+  const startRandomCircuit = () => {
+    if (!visible.length) return;
+
+    const picked = visible[Math.floor(Math.random() * visible.length)];
+    setSel(picked);
+    setPhase("brief");
+    setShowRef(false);
+    setShowHints(false);
+    setPanel(null);
+    setPhase2(null);
+    setAiSimDef(null);
+    setTestError("");
+
+    const twist = pickCreativeTwist(picked);
+    setCreativeTwist(twist);
+    setLastTwistId(twist?.id || null);
+  };
 
   return (
     <div style={{minHeight:"100vh",background:"#f1f5f9",fontFamily:"'Courier New',monospace",color:"#1e293b",padding:"16px"}}>
@@ -1047,9 +1164,15 @@ export default function App() {
                   {f}
                 </button>
               ))}
+              <button
+                onClick={startRandomCircuit}
+                style={{background:"#0f766e",color:"#ecfeff",border:"1px solid #115e59",borderRadius:6,padding:"6px 12px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace",letterSpacing:1,fontWeight:700}}
+              >
+                RANDOM + TWIST
+              </button>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))",gap:10}}>
-              <button onClick={()=>{setSel({id:"sandbox",name:"Sandbox Mode",type:"sandbox"});setPhase("draw");setShowRef(false);setShowHints(false);}}
+              <button onClick={()=>{setSel({id:"sandbox",name:"Sandbox Mode",type:"sandbox"});setPhase("draw");setShowRef(false);setShowHints(false);setCreativeTwist(null);setLastTwistId(null);setPanel(null);}}
                 style={{background:"linear-gradient(135deg, #667eea 0%, #764ba2 100%)",border:"2px solid #667eea",borderRadius:9,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.12s",color:"#fff"}}
                 onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 20px rgba(102,126,234,0.3)";}}
                 onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
@@ -1058,7 +1181,7 @@ export default function App() {
                 <div style={{fontSize:11}}>Free-form circuit building • Test & simulate • No grading</div>
               </button>
               {visible.map(c=>(
-                <button key={c.id} onClick={()=>{setSel(c);setPhase("brief");setShowRef(false);setShowHints(false);}}
+                <button key={c.id} onClick={()=>{setSel(c);setPhase("brief");setShowRef(false);setShowHints(false);setCreativeTwist(null);setLastTwistId(null);setPanel(null);setPhase2(null);setAiSimDef(null);setTestError("");}}
                   style={{background:"#fff",border:"2px solid #e2e8f0",borderRadius:9,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.12s"}}
                   onMouseEnter={e=>{e.currentTarget.style.borderColor=TC[c.type];e.currentTarget.style.transform="translateY(-1px)";}}
                   onMouseLeave={e=>{e.currentTarget.style.borderColor="#e2e8f0";e.currentTarget.style.transform="none";}}>
@@ -1112,6 +1235,33 @@ export default function App() {
                 <div style={{fontSize:9,letterSpacing:4,color:"#d97706",textTransform:"uppercase",marginBottom:10,fontWeight:700}}>Grading Checkpoints</div>
                 {sel.checkpoints.map((cp,i)=><div key={i} style={{display:"flex",gap:9,marginBottom:8,alignItems:"flex-start"}}><span style={{color:"#e2e8f0",fontSize:13,lineHeight:1.1,flexShrink:0}}>□</span><span style={{fontSize:11,color:"#64748b",lineHeight:1.5}}>{cp}</span></div>)}
               </div>
+              <div style={{background:creativeTwist?"#fffbeb":"#fff7ed",border:"1px solid "+(creativeTwist?"#fcd34d":"#fed7aa"),borderRadius:10,padding:16}}>
+                <div style={{fontSize:9,letterSpacing:3,color:"#b45309",textTransform:"uppercase",marginBottom:8,fontWeight:700}}>Creative Twist</div>
+                {creativeTwist ? (
+                  <>
+                    <div style={{fontSize:12,fontWeight:700,color:"#7c2d12",marginBottom:6}}>{creativeTwist.title}</div>
+                    <div style={{fontSize:11,color:"#9a3412",lineHeight:1.6}}>{creativeTwist.prompt}</div>
+                  </>
+                ) : (
+                  <div style={{fontSize:11,color:"#9a3412",lineHeight:1.6}}>Roll a remix objective to make this circuit more realistic and challenging.</div>
+                )}
+                <div style={{display:"flex",gap:8,marginTop:10}}>
+                  <button
+                    onClick={()=>rollCreativeTwist(sel)}
+                    style={{flex:1,background:"#b45309",border:"none",borderRadius:6,color:"#fff7ed",padding:"8px 10px",cursor:"pointer",fontSize:10,fontFamily:"'Courier New',monospace",letterSpacing:1,fontWeight:700}}
+                  >
+                    {creativeTwist ? "REROLL TWIST" : "ROLL TWIST"}
+                  </button>
+                  {creativeTwist && (
+                    <button
+                      onClick={()=>setCreativeTwist(null)}
+                      style={{background:"transparent",border:"1px solid #fdba74",borderRadius:6,color:"#b45309",padding:"8px 10px",cursor:"pointer",fontSize:10,fontFamily:"'Courier New',monospace",letterSpacing:1}}
+                    >
+                      CLEAR
+                    </button>
+                  )}
+                </div>
+              </div>
               <button onClick={()=>setPhase("draw")} style={{background:sel.type==="challenge"?"#7c3aed":"#1d4ed8",border:"none",borderRadius:9,color:"#fff",padding:"15px",cursor:"pointer",fontSize:13,fontFamily:"'Courier New',monospace",letterSpacing:3,fontWeight:700}}>
                 START DRAWING →
               </button>
@@ -1129,6 +1279,11 @@ export default function App() {
               <div>
                 <span style={{fontSize:9,color:DC[sel.diff],letterSpacing:3,textTransform:"uppercase",fontWeight:700,marginRight:10}}>{sel.diff}</span>
                 <span style={{fontSize:14,fontWeight:700,color:"#0f172a"}}>{sel.name}</span>
+                {creativeTwist && sel.type!=="sandbox" && (
+                  <div style={{fontSize:10,color:"#b45309",letterSpacing:1,marginTop:4}}>
+                    Twist: {creativeTwist.title}
+                  </div>
+                )}
               </div>
               <div style={{display:"flex",gap:7}}>
                 <button onClick={()=>setPanel(panel==="brief"?null:"brief")} style={{background:panel==="brief"?"#1e293b":"none",color:panel==="brief"?"#fff":"#64748b",border:"1px solid #e2e8f0",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace",display:sel.type==="sandbox"?"none":"block"}}>
@@ -1137,6 +1292,16 @@ export default function App() {
                 <button onClick={()=>setPhase2(phase2==="sim"?null:"sim")} style={{background:phase2==="sim"?"#0f766e":"#f0fdf4",color:phase2==="sim"?"#fff":"#0f766e",border:"1px solid #99f6e4",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace",fontWeight:700}}>
                   ⚡ SIM
                 </button>
+                {sel.type!=="sandbox" && (
+                  <button onClick={()=>rollCreativeTwist(sel)} style={{background:"#fff7ed",color:"#9a3412",border:"1px solid #fdba74",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace",fontWeight:700}}>
+                    🎲 {creativeTwist ? "NEW TWIST" : "TWIST"}
+                  </button>
+                )}
+                {creativeTwist && sel.type!=="sandbox" && (
+                  <button onClick={()=>setPanel(panel==="twist"?null:"twist")} style={{background:panel==="twist"?"#b45309":"#fffbeb",color:panel==="twist"?"#fff":"#b45309",border:"1px solid #fcd34d",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace"}}>
+                    {panel==="twist"?"HIDE TWIST":"VIEW TWIST"}
+                  </button>
+                )}
                 {sel.type==="guided"&&sel.diagram&&(
                   <button onClick={()=>setPanel(panel==="ref"?null:"ref")} style={{background:panel==="ref"?"#1e293b":"#f1f5f9",color:panel==="ref"?"#fff":"#64748b",border:"1px solid #e2e8f0",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px"}}>
                     {panel==="ref"?"HIDE REF":"REF"}
@@ -1154,7 +1319,7 @@ export default function App() {
               <div style={{position:"absolute",top:52,right:0,width:"min(420px,95%)",maxHeight:"75vh",overflowY:"auto",background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:18,zIndex:100,boxShadow:"0 8px 32px rgba(0,0,0,0.14)"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
                   <span style={{fontSize:11,fontWeight:700,color:"#0f172a",letterSpacing:1}}>
-                    {panel==="brief"?"BRIEF":panel==="ref"?"REFERENCE DIAGRAM":"HINTS"}
+                      {panel==="brief"?"BRIEF":panel==="ref"?"REFERENCE DIAGRAM":panel==="hints"?"HINTS":"CREATIVE TWIST"}
                   </span>
                   <button onClick={()=>setPanel(null)} style={{background:"none",border:"none",fontSize:16,cursor:"pointer",color:"#94a3b8",lineHeight:1}}>✕</button>
                 </div>
@@ -1164,6 +1329,13 @@ export default function App() {
                     <span style={{color:"#ddd6fe"}}>{i+1}.  </span>{h}
                   </div>
                 ))}
+                {panel==="twist" && creativeTwist && (
+                  <div style={{background:"#fffbeb",border:"1px solid #fcd34d",borderRadius:8,padding:"12px 14px"}}>
+                    <div style={{fontSize:9,letterSpacing:3,color:"#b45309",textTransform:"uppercase",marginBottom:7,fontWeight:700}}>Active Remix Objective</div>
+                    <div style={{fontSize:13,color:"#7c2d12",fontWeight:700,marginBottom:6}}>{creativeTwist.title}</div>
+                    <div style={{fontSize:12,color:"#9a3412",lineHeight:1.7}}>{creativeTwist.prompt}</div>
+                  </div>
+                )}
                 {panel==="brief" && (
                   sel.type==="challenge" ? (
                     <>
