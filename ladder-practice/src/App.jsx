@@ -437,17 +437,28 @@ function Canvas({ onSubmit }) {
   const [tool, setTool] = useState("pen");
   const [color, setColor] = useState("#111111");
   const [lw, setLw] = useState(2);
+  const [fontSize, setFontSize] = useState(14);
   const [hist, setHist] = useState([]);
+  const [textPos, setTextPos] = useState(null);
+  const [currentText, setCurrentText] = useState("");
   const last = useRef(null);
+  const textInputRef = useRef(null);
 
-  useEffect(() => {
+  const drawGrid = (ctx, w, h) => {
+    ctx.fillStyle="#fff"; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#dde6f0"; ctx.lineWidth=0.5;
+    for(let x=0;x<w;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+    for(let y=0;y<h;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+  };
+
+  useEffect(()=>{
     const c=ref.current,ctx=c.getContext("2d");
-    ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
-    ctx.strokeStyle="#dde6f0";ctx.lineWidth=0.5;
-    for(let x=0;x<c.width;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,c.height);ctx.stroke();}
-    for(let y=0;y<c.height;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(c.width,y);ctx.stroke();}
+    drawGrid(ctx,c.width,c.height);
     snap();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
+
+  useEffect(()=>{ if(textPos&&textInputRef.current) textInputRef.current.focus(); },[textPos]);
 
   const snap=()=>{const c=ref.current;if(c)setHist(h=>[...h.slice(-30),c.toDataURL()]);};
   const gp=(e)=>{
@@ -456,9 +467,33 @@ function Canvas({ onSubmit }) {
     const s=e.touches?e.touches[0]:e;
     return{x:(s.clientX-r.left)*sx,y:(s.clientY-r.top)*sy};
   };
-  const dn=(e)=>{e.preventDefault();setDrawing(true);last.current=gp(e);};
+
+  const commitText=()=>{
+    if(textPos&&currentText.trim()){
+      const c=ref.current,ctx=c.getContext("2d");
+      ctx.font=`${fontSize}px Arial`;
+      ctx.fillStyle=color;
+      ctx.fillText(currentText,textPos.x,textPos.y);
+      snap();
+    }
+    setTextPos(null);
+    setCurrentText("");
+  };
+
+  const dn=(e)=>{
+    e.preventDefault();
+    if(tool==="text"){
+      commitText();
+      setTextPos(gp(e));
+      setCurrentText("");
+      return;
+    }
+    commitText();
+    setDrawing(true);
+    last.current=gp(e);
+  };
   const mv=(e)=>{
-    e.preventDefault();if(!drawing)return;
+    e.preventDefault();if(!drawing||tool==="text")return;
     const c=ref.current,ctx=c.getContext("2d"),p=gp(e);
     ctx.beginPath();ctx.moveTo(last.current.x,last.current.y);ctx.lineTo(p.x,p.y);
     ctx.strokeStyle=tool==="eraser"?"#fff":color;
@@ -466,55 +501,106 @@ function Canvas({ onSubmit }) {
     last.current=p;
   };
   const up=()=>{if(drawing)snap();setDrawing(false);};
+
   const undo=()=>{
+    commitText();
     if(hist.length<2)return;
     const c=ref.current,ctx=c.getContext("2d"),img=new Image();
     img.onload=()=>ctx.drawImage(img,0,0);img.src=hist[hist.length-2];
     setHist(h=>h.slice(0,-1));
   };
   const clear=()=>{
+    commitText();
     const c=ref.current,ctx=c.getContext("2d");
-    ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
-    ctx.strokeStyle="#dde6f0";ctx.lineWidth=0.5;
-    for(let x=0;x<c.width;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,c.height);ctx.stroke();}
-    for(let y=0;y<c.height;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(c.width,y);ctx.stroke();}
+    drawGrid(ctx,c.width,c.height);
     snap();
+  };
+
+  const previewText=(val)=>{
+    if(!textPos||!hist.length)return;
+    const c=ref.current,ctx=c.getContext("2d"),img=new Image();
+    img.onload=()=>{
+      ctx.drawImage(img,0,0);
+      ctx.font=`${fontSize}px Arial`;
+      ctx.fillStyle=color;
+      ctx.fillText(val,textPos.x,textPos.y);
+      const w=ctx.measureText(val).width;
+      ctx.beginPath();ctx.moveTo(textPos.x+w+1,textPos.y-fontSize+2);ctx.lineTo(textPos.x+w+1,textPos.y+3);
+      ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();
+    };
+    img.src=hist[hist.length-1];
+  };
+
+  const handleTextChange=(e)=>{
+    setCurrentText(e.target.value);
+    previewText(e.target.value);
+  };
+  const handleTextKey=(e)=>{
+    if(e.key==="Enter"||e.key==="Escape"){e.preventDefault();commitText();}
   };
 
   const COLS=["#111111","#b91c1c","#1d4ed8","#15803d","#a16207","#6d28d9","#0e7490"];
   const WS=[1,2,3,5,9];
+  const FS=[10,12,14,18,24];
+  const cursor=tool==="eraser"?"cell":tool==="text"?"text":"crosshair";
 
   return (
     <div style={{display:"flex",flexDirection:"column",gap:8}}>
       <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",background:"#f9fafb",border:"1px solid #e5e7eb",borderRadius:7,padding:"7px 10px"}}>
         <div style={{display:"flex",gap:4}}>
-          {[["pen","✏️ Pen"],["eraser","⬜ Erase"]].map(([t,l])=>(
-            <button key={t} onClick={()=>setTool(t)} style={{background:tool===t?"#1e3a8a":"#e5e7eb",color:tool===t?"#fff":"#4b5563",border:"none",borderRadius:5,padding:"5px 9px",cursor:"pointer",fontSize:12,fontFamily:"'Courier New',monospace"}}>{l}</button>
+          {[["pen","✏️"],["text","T"],["eraser","⬜"]].map(([t,l])=>(
+            <button key={t} onClick={()=>{commitText();setTool(t);}}
+              style={{background:tool===t?"#1e3a8a":"#e5e7eb",color:tool===t?"#fff":"#4b5563",border:"none",borderRadius:5,padding:"5px 10px",cursor:"pointer",fontSize:t==="text"?13:12,fontWeight:t==="text"?"bold":"normal",fontFamily:"'Courier New',monospace",minWidth:36}}>
+              {l}
+            </button>
           ))}
         </div>
         <div style={{display:"flex",gap:4}}>
           {COLS.map(c=>(
-            <button key={c} onClick={()=>{setColor(c);setTool("pen");}} style={{width:20,height:20,borderRadius:"50%",background:c,border:color===c&&tool==="pen"?"3px solid #1e3a8a":"2px solid #d1d5db",cursor:"pointer",padding:0}}/>
+            <button key={c} onClick={()=>{setColor(c);if(tool==="eraser")setTool("pen");}}
+              style={{width:20,height:20,borderRadius:"50%",background:c,border:color===c?"3px solid #1e3a8a":"2px solid #d1d5db",cursor:"pointer",padding:0}}/>
           ))}
         </div>
-        <div style={{display:"flex",gap:3,alignItems:"center"}}>
-          {WS.map(w=>(
-            <button key={w} onClick={()=>setLw(w)} style={{width:26,height:26,borderRadius:4,background:lw===w?"#dbeafe":"transparent",border:"1px solid "+(lw===w?"#3b82f6":"#d1d5db"),cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <div style={{width:Math.min(w*2.5,16),height:Math.max(w,1),background:"#6b7280",borderRadius:1}}/>
-            </button>
-          ))}
-        </div>
+        {tool!=="text" && (
+          <div style={{display:"flex",gap:3,alignItems:"center"}}>
+            {WS.map(w=>(
+              <button key={w} onClick={()=>setLw(w)}
+                style={{width:26,height:26,borderRadius:4,background:lw===w?"#dbeafe":"transparent",border:"1px solid "+(lw===w?"#3b82f6":"#d1d5db"),cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <div style={{width:Math.min(w*2.5,16),height:Math.max(w,1),background:"#6b7280",borderRadius:1}}/>
+              </button>
+            ))}
+          </div>
+        )}
+        {tool==="text" && (
+          <div style={{display:"flex",gap:3,alignItems:"center"}}>
+            <span style={{fontSize:9,color:"#94a3b8",letterSpacing:1}}>SIZE</span>
+            {FS.map(s=>(
+              <button key={s} onClick={()=>setFontSize(s)}
+                style={{minWidth:28,height:26,borderRadius:4,background:fontSize===s?"#dbeafe":"transparent",border:"1px solid "+(fontSize===s?"#3b82f6":"#d1d5db"),cursor:"pointer",fontSize:9,color:"#475569",fontFamily:"'Courier New',monospace"}}>
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
         <div style={{display:"flex",gap:4,marginLeft:"auto"}}>
           <button onClick={undo} style={{background:"#f3f4f6",border:"1px solid #e5e7eb",borderRadius:5,color:"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace"}}>↩ Undo</button>
           <button onClick={clear} style={{background:"#f3f4f6",border:"1px solid #e5e7eb",borderRadius:5,color:"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace"}}>🗑 Clear</button>
         </div>
       </div>
-      <div style={{border:"2px solid #d1d5db",borderRadius:7,overflow:"hidden",cursor:tool==="eraser"?"cell":"crosshair"}}>
+      {tool==="text" && (
+        <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:5,padding:"5px 10px",fontSize:10,color:"#3b82f6"}}>
+          Click anywhere on the canvas to place text, then type. Press Enter or click elsewhere to confirm.
+        </div>
+      )}
+      <div style={{position:"relative",border:"2px solid #d1d5db",borderRadius:7,overflow:"hidden",cursor}}>
         <canvas ref={ref} width={920} height={560} style={{display:"block",width:"100%",touchAction:"none"}}
           onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up}
           onTouchStart={dn} onTouchMove={mv} onTouchEnd={up}/>
+        <input ref={textInputRef} value={currentText} onChange={handleTextChange} onKeyDown={handleTextKey} onBlur={commitText}
+          style={{position:"absolute",opacity:0,top:0,left:0,width:1,height:1,pointerEvents:"none"}}/>
       </div>
-      <button onClick={()=>onSubmit(ref.current.toDataURL("image/png"))} style={{background:"#1d4ed8",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
+      <button onClick={()=>{commitText();onSubmit(ref.current.toDataURL("image/png"));}}
+        style={{background:"#1d4ed8",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
         SUBMIT FOR GRADING →
       </button>
     </div>
@@ -534,6 +620,7 @@ export default function App() {
   const [showRef, setShowRef] = useState(false);
   const [showHints, setShowHints] = useState(false);
   const [filter, setFilter] = useState("All");
+  const [panel, setPanel] = useState(null);
 
   if (!apiKey) return <ApiKeyScreen onSave={setApiKey}/>;
 
@@ -548,7 +635,7 @@ export default function App() {
         body:JSON.stringify({
           model:"claude-sonnet-4-20250514",
           max_tokens:1400,
-          system:`You are an industrial controls instructor grading hand-drawn 24VDC ladder logic diagrams. You use "Electrical Control for Machines, 7th Edition" (Lobsiger, Giuliani, Rexford) as your curriculum. Symbol conventions: 24V and 0V rails (no rung numbers), NO contacts = two vertical bars with filled dots, NC contacts = same with diagonal slash, coils = circle with label inside, solenoid coils = circle with wave inside, pilot lights = circle with 4 rays labeled G/R/Y/B, limit switches = small box with roller actuator, relay contacts labeled CR1-1/CR1-2 etc, E-STOP NC on 24V rail. Grade against these conventions. Be encouraging, specific, practical. Plain text only. Score out of 10.`,
+          system:`You are an industrial controls instructor grading ladder logic diagrams (hand-drawn or PLC-style). You use "Electrical Control for Machines, 7th Edition" (Lobsiger, Giuliani, Rexford) as your curriculum. Accept EITHER style: (1) NEMA hand-drawn style: 24V/0V rails, NO contacts = two vertical bars with filled dots, NC contacts = same with diagonal slash, coils = circle with label inside, solenoid coils = circle with wave, pilot lights = circle with 4 rays labeled G/R/Y/B, limit switches = small box with roller actuator, relay contacts labeled CR1-1/CR1-2 etc, E-STOP NC on 24V rail. (2) PLC-style: labeled rectangular contact blocks with tag names (e.g. a box labeled CR1, STOP, START etc.), coils as labeled output blocks or parentheses. Both are correct — do not penalize for using PLC notation if the logic is correct. Grade the logic and circuit structure, not just the symbol style. Be encouraging, specific, practical. Plain text only. Score out of 10.`,
           messages:[{role:"user",content:[
             {type:"image",source:{type:"base64",media_type:"image/png",data:b64}},
             {type:"text",text:isChallenge
@@ -566,7 +653,7 @@ export default function App() {
     setLoading(false);
   };
 
-  const reset = () => { setSel(null); setPhase("select"); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); };
+  const reset = () => { setSel(null); setPhase("select"); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); setPanel(null); };
   const clearKey = () => { localStorage.removeItem("anthropic_api_key"); setApiKey(""); };
 
   const filters = ["All","Beginner","Intermediate","Advanced","Challenges"];
@@ -663,20 +750,62 @@ export default function App() {
         )}
 
         {phase==="draw" && sel && (
-          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          <div style={{display:"flex",flexDirection:"column",gap:10,position:"relative"}}>
+            {/* Top bar */}
             <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:9,padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:6}}>
               <div>
                 <span style={{fontSize:9,color:DC[sel.diff],letterSpacing:3,textTransform:"uppercase",fontWeight:700,marginRight:10}}>{sel.diff}</span>
                 <span style={{fontSize:14,fontWeight:700,color:"#0f172a"}}>{sel.name}</span>
               </div>
               <div style={{display:"flex",gap:7}}>
-                {sel.type==="guided"&&sel.diagram&&<button onClick={()=>setShowRef(!showRef)} style={{background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:5,color:"#64748b",fontSize:10,cursor:"pointer",padding:"4px 10px"}}>{showRef?"HIDE REF":"REF"}</button>}
-                {sel.type==="challenge"&&<button onClick={()=>setShowHints(!showHints)} style={{background:"#f5f3ff",border:"1px solid #ddd6fe",borderRadius:5,color:"#7c3aed",fontSize:10,cursor:"pointer",padding:"4px 10px"}}>{showHints?"HIDE HINTS":"HINTS"}</button>}
-                <button onClick={()=>setPhase("brief")} style={{background:"none",border:"1px solid #e2e8f0",borderRadius:5,color:"#94a3b8",fontSize:10,cursor:"pointer",padding:"4px 10px"}}>BRIEF</button>
+                <button onClick={()=>setPanel(panel==="brief"?null:"brief")} style={{background:panel==="brief"?"#1e293b":"none",color:panel==="brief"?"#fff":"#64748b",border:"1px solid #e2e8f0",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace"}}>
+                  📋 BRIEF
+                </button>
+                {sel.type==="guided"&&sel.diagram&&(
+                  <button onClick={()=>setPanel(panel==="ref"?null:"ref")} style={{background:panel==="ref"?"#1e293b":"#f1f5f9",color:panel==="ref"?"#fff":"#64748b",border:"1px solid #e2e8f0",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px"}}>
+                    {panel==="ref"?"HIDE REF":"REF"}
+                  </button>
+                )}
+                {sel.type==="challenge"&&(
+                  <button onClick={()=>setPanel(panel==="hints"?null:"hints")} style={{background:panel==="hints"?"#7c3aed":"#f5f3ff",color:panel==="hints"?"#fff":"#7c3aed",border:"1px solid #ddd6fe",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px"}}>
+                    {panel==="hints"?"HIDE HINTS":"HINTS"}
+                  </button>
+                )}
               </div>
             </div>
-            {showRef&&sel.diagram&&<div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:9,padding:14}}>{sel.diagram}</div>}
-            {showHints&&sel.hints&&<div style={{background:"#faf5ff",border:"1px solid #ddd6fe",borderRadius:9,padding:"12px 16px"}}>{sel.hints.map((h,i)=><div key={i} style={{fontSize:12,color:"#6d28d9",marginBottom:4,lineHeight:1.55}}><span style={{color:"#ddd6fe"}}>{i+1}.  </span>{h}</div>)}</div>}
+            {/* Slide-in panel — overlays the canvas without navigating away */}
+            {panel && (
+              <div style={{position:"absolute",top:52,right:0,width:"min(420px,95%)",maxHeight:"75vh",overflowY:"auto",background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:18,zIndex:100,boxShadow:"0 8px 32px rgba(0,0,0,0.14)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                  <span style={{fontSize:11,fontWeight:700,color:"#0f172a",letterSpacing:1}}>
+                    {panel==="brief"?"BRIEF":panel==="ref"?"REFERENCE DIAGRAM":"HINTS"}
+                  </span>
+                  <button onClick={()=>setPanel(null)} style={{background:"none",border:"none",fontSize:16,cursor:"pointer",color:"#94a3b8",lineHeight:1}}>✕</button>
+                </div>
+                {panel==="ref" && sel.diagram && sel.diagram}
+                {panel==="hints" && sel.hints && sel.hints.map((h,i)=>(
+                  <div key={i} style={{fontSize:12,color:"#6d28d9",marginBottom:7,lineHeight:1.6}}>
+                    <span style={{color:"#ddd6fe"}}>{i+1}.  </span>{h}
+                  </div>
+                ))}
+                {panel==="brief" && (
+                  sel.type==="challenge" ? (
+                    <>
+                      <p style={{fontSize:12,color:"#334155",lineHeight:1.8,background:"#faf5ff",border:"1px solid #e9d5ff",borderRadius:7,padding:"10px 12px",marginBottom:12}}>{sel.goal}</p>
+                      <div style={{fontSize:9,letterSpacing:3,color:"#94a3b8",textTransform:"uppercase",marginBottom:8}}>Checkpoints</div>
+                      {sel.checkpoints.map((cp,i)=><div key={i} style={{display:"flex",gap:8,marginBottom:6}}><span style={{color:"#e2e8f0",flexShrink:0}}>□</span><span style={{fontSize:11,color:"#64748b",lineHeight:1.5}}>{cp}</span></div>)}
+                    </>
+                  ) : (
+                    <>
+                      <div style={{fontSize:10,color:"#64748b",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Parameters</div>
+                      {sel.params.map((p,i)=><div key={i} style={{display:"flex",gap:7,marginBottom:7,alignItems:"flex-start"}}><span style={{color:"#1e40af",fontWeight:700,flexShrink:0,fontSize:12}}>{String.fromCharCode(65+i)}.</span><span style={{fontSize:11,color:"#334155",lineHeight:1.6}}>{p}</span></div>)}
+                      <div style={{fontSize:9,letterSpacing:3,color:"#94a3b8",textTransform:"uppercase",margin:"12px 0 8px"}}>Checkpoints</div>
+                      {sel.checkpoints.map((cp,i)=><div key={i} style={{display:"flex",gap:8,marginBottom:6}}><span style={{color:"#e2e8f0",flexShrink:0}}>□</span><span style={{fontSize:11,color:"#64748b",lineHeight:1.5}}>{cp}</span></div>)}
+                    </>
+                  )
+                )}
+              </div>
+            )}
             <Canvas onSubmit={grade}/>
           </div>
         )}
