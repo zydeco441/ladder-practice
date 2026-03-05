@@ -444,6 +444,7 @@ function Canvas({ onSubmit, onTest }) {
   const [textPos, setTextPos] = useState(null);
   const [currentText, setCurrentText] = useState("");
   const [showSymbols, setShowSymbols] = useState(false);
+  const [symbolMode, setSymbolMode] = useState(null);
   const last = useRef(null);
   const textInputRef = useRef(null);
 
@@ -452,6 +453,81 @@ function Canvas({ onSubmit, onTest }) {
     ctx.strokeStyle="#dde6f0"; ctx.lineWidth=0.5;
     for(let x=0;x<w;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
     for(let y=0;y<h;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+  };
+
+  const drawSymbol = (ctx, symbolName, x, y) => {
+    ctx.strokeStyle="#111"; ctx.lineWidth=2; ctx.fillStyle="#111";
+    const s = 20; // size unit
+    switch(symbolName) {
+      case "NO Contact":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-8, y, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-8, y-8); ctx.lineTo(x-8, y+8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+8, y-8); ctx.lineTo(x+8, y+8); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+8, y, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+8, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "NC Contact":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-8, y, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-8, y-8); ctx.lineTo(x-8, y+8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+8, y-8); ctx.lineTo(x+8, y+8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-2, y+6); ctx.lineTo(x+14, y-6); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+8, y, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+8, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "Coil":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+5, y, 10, 0, Math.PI*2); ctx.stroke();
+        ctx.fillText("C", x+5, y+4);
+        ctx.beginPath(); ctx.moveTo(x+15, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "Solenoid":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+5, y, 10, 0, Math.PI*2); ctx.stroke();
+        ctx.font="8px Arial"; ctx.fillText("Sol", x+5, y+4);
+        for(let i=0; i<4; i++) {
+          ctx.beginPath(); ctx.moveTo(x-2+i*3, y-3); ctx.quadraticCurveTo(x+i*3, y-6, x+2+i*3, y-3); ctx.stroke();
+        }
+        ctx.beginPath(); ctx.moveTo(x+15, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "Pilot Light":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+5, y, 10, 0, Math.PI*2); ctx.stroke();
+        const r = 14;
+        for(let i=0; i<4; i++) {
+          const a = (Math.PI/2)*i;
+          ctx.beginPath(); ctx.moveTo(x+5+Math.cos(a)*10, y+Math.sin(a)*10);
+          ctx.lineTo(x+5+Math.cos(a)*r, y+Math.sin(a)*r); ctx.stroke();
+        }
+        ctx.font="7px Arial"; ctx.fillText("L", x+5, y+4);
+        ctx.beginPath(); ctx.moveTo(x+15, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "Timer":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+5, y, 10, 0, Math.PI*2); ctx.stroke();
+        ctx.font="7px Arial"; ctx.fillText("TR", x+5, y+4);
+        ctx.beginPath(); ctx.moveTo(x+15, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "Limit Switch":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-8, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-6, y, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.strokeRect(x-6, y-8, 14, 14);
+        ctx.beginPath(); ctx.moveTo(x-2, y-8); ctx.lineTo(x+4, y-14); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+5, y-14, 2, 0, Math.PI*2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+8, y, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+8, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "E-STOP":
+        ctx.beginPath(); ctx.arc(x+5, y, 9, 0, Math.PI*2); ctx.stroke();
+        ctx.fillStyle="#dc2626"; ctx.beginPath(); ctx.arc(x+5, y, 7, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle="#fff"; ctx.font="bold 8px Arial"; ctx.fillText("●", x+4, y+4);
+        ctx.fillStyle="#111";
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+14, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      default: break;
+    }
   };
 
   useEffect(()=>{
@@ -483,8 +559,19 @@ function Canvas({ onSubmit, onTest }) {
     setCurrentText("");
   };
 
+  const handleSymbolClick = (symbolName) => {
+    setSymbolMode(symbolName);
+  };
+
   const dn=(e)=>{
     e.preventDefault();
+    if(symbolMode){
+      const c=ref.current, ctx=c.getContext("2d"), p=gp(e);
+      drawSymbol(ctx, symbolMode, p.x, p.y);
+      snap();
+      setSymbolMode(null);
+      return;
+    }
     if(tool==="text"){
       commitText();
       setTextPos(gp(e));
@@ -545,7 +632,7 @@ function Canvas({ onSubmit, onTest }) {
   const COLS=["#111111","#b91c1c","#1d4ed8","#15803d","#a16207","#6d28d9","#0e7490"];
   const WS=[1,2,3,5,9];
   const FS=[10,12,14,18,24];
-  const cursor=tool==="eraser"?"cell":tool==="text"?"text":"crosshair";
+  const cursor=symbolMode?"crosshair":tool==="eraser"?"cell":tool==="text"?"text":"crosshair";
 
   return (
     <div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -593,40 +680,16 @@ function Canvas({ onSubmit, onTest }) {
       </div>
       {showSymbols && (
         <div style={{background:"#f9fafb",border:"1px solid #e5e7eb",borderRadius:8,padding:12,marginBottom:12}}>
-          <div style={{fontSize:9,fontWeight:700,color:"#475569",marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>NEMA Symbols</div>
+          <div style={{fontSize:9,fontWeight:700,color:"#475569",marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>Click a symbol, then click the canvas to place it</div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,fontSize:9}}>
-            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
-              <strong style={{color:"#334155"}}>NO Contact</strong>
-              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Two vertical lines with dot</div>
-            </div>
-            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
-              <strong style={{color:"#334155"}}>NC Contact</strong>
-              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Two vertical lines with slash</div>
-            </div>
-            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
-              <strong style={{color:"#334155"}}>Coil</strong>
-              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Circle with label (CR1, etc.)</div>
-            </div>
-            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
-              <strong style={{color:"#334155"}}>Solenoid</strong>
-              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Circle with wavy line</div>
-            </div>
-            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
-              <strong style={{color:"#334155"}}>Pilot Light</strong>
-              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Circle with 4 rays (G/R/Y/B)</div>
-            </div>
-            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
-              <strong style={{color:"#334155"}}>Timer</strong>
-              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Circle labeled 1TR</div>
-            </div>
-            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
-              <strong style={{color:"#334155"}}>Limit Switch</strong>
-              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Rectangle with roller</div>
-            </div>
-            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
-              <strong style={{color:"#334155"}}>E-STOP</strong>
-              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Red circle on 24V rail</div>
-            </div>
+            {["NO Contact","NC Contact","Coil","Solenoid","Pilot Light","Timer","Limit Switch","E-STOP"].map(sym=>(
+              <div key={sym} onClick={()=>handleSymbolClick(sym)} style={{padding:8,background:symbolMode===sym?"#dbeafe":"#fff",border:"1px solid "+(symbolMode===sym?"#0284c7":"#e2e8f0"),borderRadius:4,cursor:"pointer",transition:"0.2s"}}
+                onMouseEnter={(e)=>{if(symbolMode!==sym)e.target.style.background="#f0f9ff";}}
+                onMouseLeave={(e)=>{e.target.style.background=symbolMode===sym?"#dbeafe":"#fff";}}>
+                <strong style={{color:symbolMode===sym?"#0284c7":"#334155"}}>{sym}</strong>
+                <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>{symbolMode===sym?"Click canvas to place →":""}</div>
+              </div>
+            ))}
           </div>
         </div>
       )}
