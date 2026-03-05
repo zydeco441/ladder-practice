@@ -549,11 +549,9 @@ function Canvas({ onSubmit, onTest }) {
 
   return (
     <div style={{display:"flex",flexDirection:"column",gap:8}}>
-      <div style={{background:"#fff",border:"1px solid #e5e7eb",borderRadius:8,padding:"12px 14px",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"}}>
-        <div style={{display:"flex",flexWrap:"wrap",gap:8,alignItems:"center",marginBottom:8}}>
-          <div style={{fontSize:8,fontWeight:700,color:"#94a3b8",letterSpacing:2,textTransform:"uppercase"}}>DRAWING TOOLS</div>
-          <div style={{display:"flex",gap:3}}>
-            {[["pen","Pen"],["text","Text"],["eraser","Erase"]].map(([t,l])=>(
+      <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",background:"#f9fafb",border:"1px solid #e5e7eb",borderRadius:7,padding:"7px 10px"}}>
+        <div style={{display:"flex",gap:4}}>
+          {[["pen","✏️"],["text","T"],["eraser","⬜"]].map(([t,l])=>(
             <button key={t} onClick={()=>{commitText();setTool(t);}}
               style={{background:tool===t?"#1e3a8a":"#e5e7eb",color:tool===t?"#fff":"#4b5563",border:"none",borderRadius:5,padding:"5px 10px",cursor:"pointer",fontSize:t==="text"?13:12,fontWeight:t==="text"?"bold":"normal",fontFamily:"'Courier New',monospace",minWidth:36}}>
               {l}
@@ -588,9 +586,55 @@ function Canvas({ onSubmit, onTest }) {
           </div>
         )}
         <div style={{display:"flex",gap:4,marginLeft:"auto"}}>
-          <button onClick={()=>setShowSymbols(!showSymbols)} style={{background:showSymbols?"#e0f2fe":"#f3f4f6",border:"1px solid "+(showSymbols?"#0284c7":"#e5e7eb"),borderRadius:5,color:showSymbols?"#0c4a6e":"#64748b",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace",fontWeight:700}}>⚡ Symbols</button>\n          <button onClick={undo} style={{background:"#f3f4f6",border:"1px solid #e5e7eb",borderRadius:5,color:"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace"}}>↩ Undo</button>\n          <button onClick={clear} style={{background:"#f3f4f6",border:"1px solid #e5e7eb",borderRadius:5,color:"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace"}}>🗑 Clear</button>\n        </div>
+          <button onClick={()=>setShowSymbols(!showSymbols)} style={{background:showSymbols?"#dcfce7":"#f3f4f6",border:"1px solid "+(showSymbols?"#22c55e":"#e5e7eb"),borderRadius:5,color:showSymbols?"#15803d":"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace",fontWeight:700}}>⚡ Symbols</button>
+          <button onClick={undo} style={{background:"#f3f4f6",border:"1px solid #e5e7eb",borderRadius:5,color:"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace"}}>↩ Undo</button>
+          <button onClick={clear} style={{background:"#f3f4f6",border:"1px solid #e5e7eb",borderRadius:5,color:"#6b7280",padding:"5px 9px",cursor:"pointer",fontSize:11,fontFamily:"'Courier New',monospace"}}>🗑 Clear</button>
+        </div>
       </div>
-      {showSymbols && (<br/>        <div style={{background:\"#f9fafb\",border:\"1px solid #e5e7eb\",borderRadius:8,padding:14}}>\n          <div style={{fontSize:9,fontWeight:700,color:\"#475569\",letterSpacing:2,textTransform:\"uppercase\",marginBottom:10}}>Standard NEMA Symbols Reference</div>\n          <div style={{display:\"grid\",gridTemplateColumns:\"repeat(auto-fit,minmax(160px,1fr))\",gap:12}}>\n            <div style={{background:\"#fff\",border:\"1px solid #e2e8f0\",borderRadius:6,padding:10}}><strong style={{fontSize:10,color:\"#334155\"}}>NO Contact</strong><div style={{fontSize:9,color:\"#94a3b8\",marginTop:4}}>Two vertical lines with dot.</div></div>\n            <div style={{background:\"#fff\",border:\"1px solid #e2e8f0\",borderRadius:6,padding:10}}><strong style={{fontSize:10,color:\"#334155\"}}>NC Contact</strong><div style={{fontSize:9,color:\"#94a3b8\",marginTop:4}}>Two vertical lines with slash.</div></div>\n            <div style={{background:\"#fff\",border:\"1px solid #e2e8f0\",borderRadius:6,padding:10}}><strong style={{fontSize:10,color:\"#334155\"}}>Coil</strong><div style={{fontSize:9,color:\"#94a3b8\",marginTop:4}}>Circle with label like CR1.</div></div>\n            <div style={{background:\"#fff\",border:\"1px solid #e2e8f0\",borderRadius:6,padding:10}}><strong style={{fontSize:10,color:\"#334155\"}}>Solenoid</strong><div style={{fontSize:9,color:\"#94a3b8\",marginTop:4}}>Circle with wavy line.</div></div>\n            <div style={{background:\"#fff\",border:\"1px solid #e2e8f0\",borderRadius:6,padding:10}}><strong style={{fontSize:10,color:\"#334155\"}}>Pilot Light</strong><div style={{fontSize:9,color:\"#94a3b8\",marginTop:4}}>Circle with 4 rays. G/R/Y/B.</div></div>\n            <div style={{background:\"#fff\",border:\"1px solid #e2e8f0\",borderRadius:6,padding:10}}><strong style={{fontSize:10,color:\"#334155\"}}>Timer</strong><div style={{fontSize:9,color:\"#94a3b8\",marginTop:4}}>Circle labeled 1TR.</div></div>\n            <div style={{background:\"#fff\",border:\"1px solid #e2e8f0\",borderRadius:6,padding:10}}><strong style={{fontSize:10,color:\"#334155\"}}>Limit Switch</strong><div style={{fontSize:9,color:\"#94a3b8\",marginTop:4}}>Small rectangle with roller.</div></div>\n            <div style={{background:\"#fff\",border:\"1px solid #e2e8f0\",borderRadius:6,padding:10}}><strong style={{fontSize:10,color:\"#334155\"}}>E-STOP</strong><div style={{fontSize:9,color:\"#94a3b8\",marginTop:4}}>Red circle on 24V rail.</div></div>\n          </div>\n        </div>\n      )}\n      {tool===\"text\" && !showSymbols && (\n        <div style={{background:\"#eff6ff\",border:\"1px solid #bfdbfe\",borderRadius:5,padding:\"5px 10px\",fontSize:10,color:\"#3b82f6\"}}>\n          Click anywhere on the canvas to place text, then type. Press Enter or click elsewhere to confirm.\n        </div>\n      )}
+      {showSymbols && (
+        <div style={{background:"#f9fafb",border:"1px solid #e5e7eb",borderRadius:8,padding:12,marginBottom:12}}>
+          <div style={{fontSize:9,fontWeight:700,color:"#475569",marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>NEMA Symbols</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,fontSize:9}}>
+            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
+              <strong style={{color:"#334155"}}>NO Contact</strong>
+              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Two vertical lines with dot</div>
+            </div>
+            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
+              <strong style={{color:"#334155"}}>NC Contact</strong>
+              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Two vertical lines with slash</div>
+            </div>
+            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
+              <strong style={{color:"#334155"}}>Coil</strong>
+              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Circle with label (CR1, etc.)</div>
+            </div>
+            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
+              <strong style={{color:"#334155"}}>Solenoid</strong>
+              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Circle with wavy line</div>
+            </div>
+            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
+              <strong style={{color:"#334155"}}>Pilot Light</strong>
+              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Circle with 4 rays (G/R/Y/B)</div>
+            </div>
+            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
+              <strong style={{color:"#334155"}}>Timer</strong>
+              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Circle labeled 1TR</div>
+            </div>
+            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
+              <strong style={{color:"#334155"}}>Limit Switch</strong>
+              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Rectangle with roller</div>
+            </div>
+            <div style={{padding:8,background:"#fff",border:"1px solid #e2e8f0",borderRadius:4}}>
+              <strong style={{color:"#334155"}}>E-STOP</strong>
+              <div style={{fontSize:8,color:"#94a3b8",marginTop:4}}>Red circle on 24V rail</div>
+            </div>
+          </div>
+        </div>
+      )}
+      {tool==="text" && (
+        <div style={{background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:5,padding:"5px 10px",fontSize:10,color:"#3b82f6"}}>
+          Click anywhere on the canvas to place text, then type. Press Enter or click elsewhere to confirm.
+        </div>
+      )}
       <div style={{position:"relative",border:"2px solid #d1d5db",borderRadius:7,overflow:"hidden",cursor}}>
         <canvas ref={ref} width={920} height={560} style={{display:"block",width:"100%",touchAction:"none"}}
           onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up}
@@ -745,11 +789,12 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(285px,1fr))",gap:12}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))",gap:10}}>
               {visible.map(c=>(
                 <button key={c.id} onClick={()=>{setSel(c);setPhase("brief");setShowRef(false);setShowHints(false);}}
-                  style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"16px",textAlign:"left",cursor:"pointer",transition:"all 0.2s",boxShadow:"0 1px 3px rgba(0,0,0,0.05)"}}
-                  onMouseEnter={e=>{e.currentTarget.style.borderColor=DC[c.diff];e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 16px rgba(0,0,0,0.12)";}}\n                  onMouseLeave={e=>{e.currentTarget.style.borderColor="#e2e8f0";e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.05)";}}>
+                  style={{background:"#fff",border:"2px solid #e2e8f0",borderRadius:9,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.12s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=TC[c.type];e.currentTarget.style.transform="translateY(-1px)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor="#e2e8f0";e.currentTarget.style.transform="none";}}>
                   <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
                     <span style={{fontSize:9,color:DC[c.diff],letterSpacing:3,textTransform:"uppercase",fontWeight:700}}>{c.diff}</span>
                     <span style={{fontSize:9,background:TC[c.type]+"18",color:TC[c.type],border:`1px solid ${TC[c.type]}33`,borderRadius:4,padding:"1px 6px",letterSpacing:1}}>{c.type==="challenge"?"CHALLENGE":"GUIDED"}</span>
