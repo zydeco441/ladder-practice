@@ -433,7 +433,7 @@ function ApiKeyScreen({ onSave }) {
 // ═══════════════════════════════════════════════════════════════════
 // CANVAS
 // ═══════════════════════════════════════════════════════════════════
-function Canvas({ onSubmit, onTest }) {
+function Canvas({ onSubmit, onTest, isSandbox }) {
   const ref = useRef(null);
   const [drawing, setDrawing] = useState(false);
   const [tool, setTool] = useState("pen");
@@ -456,75 +456,108 @@ function Canvas({ onSubmit, onTest }) {
   };
 
   const drawSymbol = (ctx, symbolName, x, y) => {
-    ctx.strokeStyle="#111"; ctx.lineWidth=2; ctx.fillStyle="#111";
-    const s = 20; // size unit
+    ctx.strokeStyle="#111"; ctx.lineWidth=2.5; ctx.fillStyle="#111";
+    const s = 24;
     switch(symbolName) {
       case "NO Contact":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-8, y, 2.5, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x-8, y-8); ctx.lineTo(x-8, y+8); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+8, y-8); ctx.lineTo(x+8, y+8); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+8, y, 2.5, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+8, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-10, y-9); ctx.lineTo(x-10, y+9); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+10, y-9); ctx.lineTo(x+10, y+9); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "NC Contact":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-8, y, 2.5, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x-8, y-8); ctx.lineTo(x-8, y+8); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+8, y-8); ctx.lineTo(x+8, y+8); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-2, y+6); ctx.lineTo(x+14, y-6); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+8, y, 2.5, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+8, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-10, y-9); ctx.lineTo(x-10, y+9); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+10, y-9); ctx.lineTo(x+10, y+9); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-2, y+7); ctx.lineTo(x+18, y-7); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "NO Pushbutton":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-10, y-8); ctx.lineTo(x-2, y-8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-6, y-8); ctx.lineTo(x-6, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+10, y-8); ctx.lineTo(x+2, y-8); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "NC Pushbutton":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-10, y+8); ctx.lineTo(x-2, y+8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-6, y+8); ctx.lineTo(x-6, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+10, y+8); ctx.lineTo(x+2, y+8); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Coil":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+5, y, 10, 0, Math.PI*2); ctx.stroke();
-        ctx.fillText("C", x+5, y+4);
-        ctx.beginPath(); ctx.moveTo(x+15, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+5, y, 13, 0, Math.PI*2); ctx.stroke();
+        ctx.font="bold 10px Arial"; ctx.fillText("CR", x+2, y+5);
+        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Solenoid":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+5, y, 10, 0, Math.PI*2); ctx.stroke();
-        ctx.font="8px Arial"; ctx.fillText("Sol", x+5, y+4);
-        for(let i=0; i<4; i++) {
-          ctx.beginPath(); ctx.moveTo(x-2+i*3, y-3); ctx.quadraticCurveTo(x+i*3, y-6, x+2+i*3, y-3); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        for(let i=0; i<5; i++) {
+          const xp = x-10+i*5;
+          ctx.beginPath();
+          if(i % 2 === 0) ctx.moveTo(xp, y-6);
+          else ctx.moveTo(xp, y+6);
+          ctx.lineTo(xp+2.5, y+(i%2===0?6:-6));
+          ctx.stroke();
         }
-        ctx.beginPath(); ctx.moveTo(x+15, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Pilot Light":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+5, y, 10, 0, Math.PI*2); ctx.stroke();
-        const r = 14;
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+5, y, 12, 0, Math.PI*2); ctx.stroke();
+        const r = 18;
         for(let i=0; i<4; i++) {
-          const a = (Math.PI/2)*i;
-          ctx.beginPath(); ctx.moveTo(x+5+Math.cos(a)*10, y+Math.sin(a)*10);
+          const a = (Math.PI/2)*i + Math.PI/4;
+          ctx.beginPath(); ctx.moveTo(x+5+Math.cos(a)*12, y+Math.sin(a)*12);
           ctx.lineTo(x+5+Math.cos(a)*r, y+Math.sin(a)*r); ctx.stroke();
         }
-        ctx.font="7px Arial"; ctx.fillText("L", x+5, y+4);
-        ctx.beginPath(); ctx.moveTo(x+15, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.font="8px Arial"; ctx.fillText("L", x+4, y+5);
+        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Timer":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+5, y, 10, 0, Math.PI*2); ctx.stroke();
-        ctx.font="7px Arial"; ctx.fillText("TR", x+5, y+4);
-        ctx.beginPath(); ctx.moveTo(x+15, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+5, y, 13, 0, Math.PI*2); ctx.stroke();
+        ctx.font="bold 9px Arial"; ctx.fillText("TR", x+2, y+5);
+        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
-      case "Limit Switch":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-8, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-6, y, 2.5, 0, Math.PI*2); ctx.fill();
-        ctx.strokeRect(x-6, y-8, 14, 14);
-        ctx.beginPath(); ctx.moveTo(x-2, y-8); ctx.lineTo(x+4, y-14); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+5, y-14, 2, 0, Math.PI*2); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+8, y, 2.5, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+8, y); ctx.lineTo(x+s, y); ctx.stroke();
+      case "NO Limit Switch":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-10, y); ctx.lineTo(x-10, y+12); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-10, y+12); ctx.lineTo(x-6, y+18); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-4, y+16); ctx.lineTo(x-8, y+20); ctx.lineTo(x-10, y+16); ctx.closePath(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        break;
+      case "NC Limit Switch":
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x-10, y); ctx.lineTo(x-10, y+12); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-10, y+12); ctx.lineTo(x-6, y+18); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-4, y+16); ctx.lineTo(x-8, y+20); ctx.lineTo(x-10, y+16); ctx.closePath(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+10, y+12); ctx.lineTo(x+6, y+18); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "E-STOP":
-        ctx.beginPath(); ctx.arc(x+5, y, 9, 0, Math.PI*2); ctx.stroke();
-        ctx.fillStyle="#dc2626"; ctx.beginPath(); ctx.arc(x+5, y, 7, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle="#fff"; ctx.font="bold 8px Arial"; ctx.fillText("●", x+4, y+4);
-        ctx.fillStyle="#111";
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+14, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+6, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle="#dc2626"; ctx.beginPath(); ctx.arc(x+6, y-9, 8, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle="#111";
+        ctx.beginPath(); ctx.moveTo(x+6, y-8); ctx.lineTo(x+6, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+6, y); ctx.lineTo(x+16, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+18, y, 3, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s+4, y); ctx.stroke();
         break;
       default: break;
     }
@@ -682,7 +715,7 @@ function Canvas({ onSubmit, onTest }) {
         <div style={{background:"#f9fafb",border:"1px solid #e5e7eb",borderRadius:8,padding:12,marginBottom:12}}>
           <div style={{fontSize:9,fontWeight:700,color:"#475569",marginBottom:8,letterSpacing:1,textTransform:"uppercase"}}>Click a symbol, then click the canvas to place it</div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,fontSize:9}}>
-            {["NO Contact","NC Contact","Coil","Solenoid","Pilot Light","Timer","Limit Switch","E-STOP"].map(sym=>(
+            {["NO Contact","NC Contact","NO Pushbutton","NC Pushbutton","Coil","Solenoid","Pilot Light","Timer","NO Limit Switch","NC Limit Switch","E-STOP"].map(sym=>(
               <div key={sym} onClick={()=>handleSymbolClick(sym)} style={{padding:8,background:symbolMode===sym?"#dbeafe":"#fff",border:"1px solid "+(symbolMode===sym?"#0284c7":"#e2e8f0"),borderRadius:4,cursor:"pointer",transition:"0.2s"}}
                 onMouseEnter={(e)=>{if(symbolMode!==sym)e.target.style.background="#f0f9ff";}}
                 onMouseLeave={(e)=>{e.target.style.background=symbolMode===sym?"#dbeafe":"#fff";}}>
@@ -853,6 +886,14 @@ export default function App() {
               ))}
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))",gap:10}}>
+              <button onClick={()=>{setSel({id:"sandbox",name:"Sandbox Mode",type:"sandbox"});setPhase("draw");setShowRef(false);setShowHints(false);}}
+                style={{background:"linear-gradient(135deg, #667eea 0%, #764ba2 100%)",border:"2px solid #667eea",borderRadius:9,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.12s",color:"#fff"}}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 20px rgba(102,126,234,0.3)";}}
+                onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+                <div style={{fontSize:11,letterSpacing:3,fontWeight:700,marginBottom:6}}>⚙️ EXPERIMENTAL</div>
+                <div style={{fontSize:15,fontWeight:700,marginBottom:4}}>Sandbox Mode</div>
+                <div style={{fontSize:11}}>Free-form circuit building • Test & simulate • No grading</div>
+              </button>
               {visible.map(c=>(
                 <button key={c.id} onClick={()=>{setSel(c);setPhase("brief");setShowRef(false);setShowHints(false);}}
                   style={{background:"#fff",border:"2px solid #e2e8f0",borderRadius:9,padding:"14px",textAlign:"left",cursor:"pointer",transition:"all 0.12s"}}
@@ -870,7 +911,7 @@ export default function App() {
           </>
         )}
 
-        {phase==="brief" && sel && (
+        {phase==="brief" && sel && sel.type!=="sandbox" && (
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
             <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:20}}>
               {sel.type==="challenge" ? (
@@ -927,7 +968,7 @@ export default function App() {
                 <span style={{fontSize:14,fontWeight:700,color:"#0f172a"}}>{sel.name}</span>
               </div>
               <div style={{display:"flex",gap:7}}>
-                <button onClick={()=>setPanel(panel==="brief"?null:"brief")} style={{background:panel==="brief"?"#1e293b":"none",color:panel==="brief"?"#fff":"#64748b",border:"1px solid #e2e8f0",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace"}}>
+                <button onClick={()=>setPanel(panel==="brief"?null:"brief")} style={{background:panel==="brief"?"#1e293b":"none",color:panel==="brief"?"#fff":"#64748b",border:"1px solid #e2e8f0",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace",display:sel.type==="sandbox"?"none":"block"}}>
                   📋 BRIEF
                 </button>
                 <button onClick={()=>setPhase2(phase2==="sim"?null:"sim")} style={{background:phase2==="sim"?"#0f766e":"#f0fdf4",color:phase2==="sim"?"#fff":"#0f766e",border:"1px solid #99f6e4",borderRadius:5,fontSize:10,cursor:"pointer",padding:"4px 10px",fontFamily:"'Courier New',monospace",fontWeight:700}}>
@@ -1002,14 +1043,14 @@ export default function App() {
                 circuit={sel}
                 circuitId={aiSimDef ? null : sel.id}
                 simDef={aiSimDef || undefined}
-                onClose={()=>{setPhase2(null);setAiSimDef(null);}}
+                onClose={()=>{if(sel?.type==="sandbox"){setPhase("draw")}setPhase2(null);setAiSimDef(null);}}
               />
             )}
-            {phase2!=="sim" && phase2!=="sim-loading" && <Canvas onSubmit={grade} onTest={testCircuit}/>}
+            {phase2!=="sim" && phase2!=="sim-loading" && <Canvas onSubmit={grade} onTest={testCircuit} isSandbox={sel.type==="sandbox"}/>}
           </div>
         )}
 
-        {phase==="feedback" && (
+        {phase==="feedback" && sel && (
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
             <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:14}}>
               <div style={{fontSize:9,letterSpacing:4,color:"#94a3b8",textTransform:"uppercase",marginBottom:9}}>Your Drawing</div>
