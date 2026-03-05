@@ -432,7 +432,7 @@ function ApiKeyScreen({ onSave }) {
 // ═══════════════════════════════════════════════════════════════════
 // CANVAS
 // ═══════════════════════════════════════════════════════════════════
-function Canvas({ onSubmit }) {
+function Canvas({ onSubmit, onTest }) {
   const ref = useRef(null);
   const [drawing, setDrawing] = useState(false);
   const [tool, setTool] = useState("pen");
@@ -600,10 +600,16 @@ function Canvas({ onSubmit }) {
         <input ref={textInputRef} value={currentText} onChange={handleTextChange} onKeyDown={handleTextKey} onBlur={commitText}
           style={{position:"absolute",opacity:0,top:0,left:0,width:1,height:1,pointerEvents:"none"}}/>
       </div>
-      <button onClick={()=>{commitText();onSubmit(ref.current.toDataURL("image/png"));}}
-        style={{background:"#1d4ed8",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
-        SUBMIT FOR GRADING →
-      </button>
+      <div style={{display:"flex",gap:10}}>
+        <button onClick={()=>{commitText();onSubmit(ref.current.toDataURL("image/png"));}}
+          style={{flex:1,background:"#1d4ed8",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
+          SUBMIT FOR GRADING →
+        </button>
+        <button onClick={()=>{commitText();onTest(ref.current.toDataURL("image/png"));}}
+          style={{flex:1,background:"#0f766e",border:"none",borderRadius:7,color:"#fff",padding:"12px",cursor:"pointer",fontSize:14,fontWeight:700,letterSpacing:2,fontFamily:"'Courier New',monospace"}}>
+          ⚡ TEST MY CIRCUIT
+        </button>
+      </div>
     </div>
   );
 }
@@ -623,6 +629,9 @@ export default function App() {
   const [filter, setFilter] = useState("All");
   const [panel, setPanel] = useState(null);
   const [phase2, setPhase2] = useState(null); // null | "sim"
+  const [aiSimDef, setAiSimDef] = useState(null);   // AI-generated sim definition
+  const [testLoading, setTestLoading] = useState(false);
+  const [testError, setTestError] = useState("");
 
   if (!apiKey) return <ApiKeyScreen onSave={setApiKey}/>;
 
@@ -655,7 +664,85 @@ export default function App() {
     setLoading(false);
   };
 
-  const reset = () => { setSel(null); setPhase("select"); setPhase2(null); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); setPanel(null); };
+  const testCircuit = async (dataUrl) => {
+    setTestLoading(true);
+    setTestError("");
+    setAiSimDef(null);
+    setPhase2("sim-loading");
+    try {
+      const b64 = dataUrl.split(",")[1];
+      const res = await fetch("/api/grade", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-api-key":apiKey},
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514",
+          max_tokens:2000,
+          system:`You are a ladder logic circuit parser. You will be given an image of a hand-drawn or PLC-style 24VDC ladder logic diagram. Your job is to extract the circuit topology and return it as a strict JSON object that can be used to simulate the circuit.
+
+Return ONLY a JSON object with no markdown, no explanation, no code fences. Just raw JSON.
+
+The JSON must follow this exact schema:
+{
+  "rungs": [
+    {
+      "id": "r1",
+      "series": [ ...elements... ],
+      "outputs": ["COIL_ID"]
+    }
+  ],
+  "coils": {
+    "COIL_ID": { "label": "CR1", "type": "relay" }
+  },
+  "inputs": {
+    "INPUT_ID": { "label": "START", "type": "pb_no" }
+  }
+}
+
+Element types for series arrays:
+- { "type": "ESTOP", "id": "ESTOP" } — E-STOP NC contact
+- { "type": "NO", "id": "START", "label": "START" } — normally open contact (pushbutton or relay contact)
+- { "type": "NC", "id": "STOP", "label": "STOP" } — normally closed contact
+- { "type": "NO_LS", "id": "1LS", "label": "1LS" } — NO limit switch
+- { "type": "NC_LS", "id": "2LS", "label": "2LS" } — NC limit switch
+- { "type": "PARALLEL", "branches": [[...elements...], [...elements...]] } — parallel (OR) branches
+
+IMPORTANT: For relay contacts (CR1-1, CR1-2 etc), use the BASE relay id as the element id (e.g. id:"CR1" for CR1-1, CR1-2 etc). The label can be the full "CR1-1".
+
+Coil types: "relay", "light", "sol", "motor"
+Light colors: G="#16a34a", R="#dc2626", Y="#eab308", B="#2563eb"
+
+Input types:
+- "estop" — E-STOP (default closed/true)
+- "pb_no" — NO pushbutton (momentary)
+- "pb_nc" — NC pushbutton (STOP button)
+- "ls_no" — NO limit switch (toggle)
+- "ls_nc" — NC limit switch (toggle)
+
+If the circuit is too unclear to parse confidently, return:
+{ "error": "Could not parse: [specific reason why, e.g. labels unreadable, rung structure unclear, missing rail labels]" }`,
+          messages:[{role:"user",content:[
+            {type:"image",source:{type:"base64",media_type:"image/png",data:b64}},
+            {type:"text",text:"Parse this ladder logic diagram into the JSON circuit topology schema. Return only raw JSON."}
+          ]}]
+        })
+      });
+      if (res.status === 401) { setTestError("Invalid API key."); setPhase2(null); setTestLoading(false); return; }
+      const data = await res.json();
+      const raw = data.content?.map(b=>b.text||"").join("") || "";
+      // Strip any accidental markdown fences
+      const cleaned = raw.replace(/```json|```/g,"").trim();
+      let parsed;
+      try { parsed = JSON.parse(cleaned); }
+      catch(e) { setTestError("AI returned invalid JSON. Try redrawing with clearer labels and lines."); setPhase2(null); setTestLoading(false); return; }
+      if (parsed.error) { setTestError("Could not simulate: " + parsed.error); setPhase2(null); setTestLoading(false); return; }
+      if (!parsed.rungs || !parsed.coils || !parsed.inputs) { setTestError("AI could not identify a complete circuit. Make sure your rails, contacts, and coils are clearly drawn and labeled."); setPhase2(null); setTestLoading(false); return; }
+      setAiSimDef(parsed);
+      setPhase2("sim");
+    } catch(err) { setTestError("Network error: " + err.message); setPhase2(null); }
+    setTestLoading(false);
+  };
+
+  const reset = () => { setSel(null); setPhase("select"); setPhase2(null); setFeedback(""); setDrawn(null); setShowRef(false); setShowHints(false); setPanel(null); setAiSimDef(null); setTestError(""); setTestLoading(false); };
   const clearKey = () => { localStorage.removeItem("anthropic_api_key"); setApiKey(""); };
 
   const filters = ["All","Beginner","Intermediate","Advanced","Challenges"];
@@ -814,8 +901,34 @@ export default function App() {
                 )}
               </div>
             )}
-            {phase2==="sim" && <Simulator circuit={sel} circuitId={sel.id} onClose={()=>setPhase2(null)}/>}
-            {phase2!=="sim" && <Canvas onSubmit={grade}/>}
+            {phase2==="sim-loading" && (
+              <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:40,textAlign:"center"}}>
+                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+                <div style={{width:36,height:36,border:"3px solid #e2e8f0",borderTop:"3px solid #0f766e",borderRadius:"50%",margin:"0 auto 16px",animation:"spin 0.8s linear infinite"}}/>
+                <div style={{fontSize:13,color:"#475569",fontFamily:"'Courier New',monospace",letterSpacing:1}}>READING YOUR CIRCUIT...</div>
+                <div style={{fontSize:10,color:"#94a3b8",marginTop:8}}>AI is parsing your drawing into a live simulation</div>
+              </div>
+            )}
+            {testError && phase2!=="sim" && phase2!=="sim-loading" && (
+              <div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:10,padding:16,display:"flex",gap:12,alignItems:"flex-start"}}>
+                <span style={{fontSize:18,flexShrink:0}}>⚠️</span>
+                <div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#dc2626",marginBottom:4,fontFamily:"'Courier New',monospace"}}>SIMULATION FAILED</div>
+                  <div style={{fontSize:12,color:"#7f1d1d",lineHeight:1.7}}>{testError}</div>
+                  <div style={{fontSize:11,color:"#94a3b8",marginTop:8}}>Tips: make sure all contacts and coils are clearly labeled, rails are visible, and lines are connected.</div>
+                  <button onClick={()=>setTestError("")} style={{marginTop:10,background:"none",border:"1px solid #fecaca",borderRadius:5,color:"#dc2626",padding:"4px 10px",cursor:"pointer",fontSize:10,fontFamily:"'Courier New',monospace"}}>DISMISS</button>
+                </div>
+              </div>
+            )}
+            {phase2==="sim" && (
+              <Simulator
+                circuit={sel}
+                circuitId={aiSimDef ? null : sel.id}
+                simDef={aiSimDef || undefined}
+                onClose={()=>{setPhase2(null);setAiSimDef(null);}}
+              />
+            )}
+            {phase2!=="sim" && phase2!=="sim-loading" && <Canvas onSubmit={grade} onTest={testCircuit}/>}
           </div>
         )}
 
