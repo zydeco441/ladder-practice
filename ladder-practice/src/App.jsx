@@ -430,67 +430,67 @@ function DiagDoubleActing() {
 // CIRCUITS DATA
 // ═══════════════════════════════════════════════════════════════════
 const CIRCUITS = [
-  { id:1, name:"Start / Stop — Light Output", diff:"Beginner", ch:"Ch. 3", type:"guided",
+  { id:1, name:"Start / Stop — Light Output", diff:"Beginner", ch:"Ch. 3", type:"guided", components:["Relay","Latching Relay"],
     params:["24V / 0V rails. E-STOP (NC) on 24V rail before all rungs.","Rung 1: NC STOP — NO START — CR1 coil. CR1-1 seal-in contact wired in parallel with START.","Rung 2: NO CR1-2 contact — G (green pilot light).","When START is pressed, CR1 energizes and seals in. Green light turns on. STOP or E-STOP kills everything."],
     tips:["STOP is NC — it must open to kill the relay","Seal-in CR1-1 is in parallel with START so releasing START keeps CR1 held","Pilot light G uses a circle with 4 rays, labeled G"],
     checkpoints:["E-STOP NC on 24V rail","NC STOP present","NO START present","CR1-1 seal-in parallel with START","G light on second rung","All contacts labeled"],
     diagram:<DiagSimpleLightControl/> },
-  { id:2, name:"Run / Stop — Green ON, Red OFF", diff:"Beginner", ch:"Ch. 3", type:"guided",
+  { id:2, name:"Run / Stop — Green ON, Red OFF", diff:"Beginner", ch:"Ch. 3", type:"guided", components:["Relay","Latching Relay"],
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NC STOP — NO START — CR1 coil. CR1-1 seal-in parallel with START.","Rung 2: NO CR1-2 — G (green light). Green is ON when running.","Rung 3: NC CR1-3 — R (red light). Red is ON when stopped.","Only one light should be on at a time."],
     tips:["NO CR1 → green: on only when relay is energized","NC CR1 → red: on only when relay is de-energized","Mutually exclusive — when one is on the other is off"],
     checkpoints:["CR1 seal-in rung","NO CR1-2 → G light","NC CR1-3 → R light","Lights mutually exclusive","E-STOP present"],
     diagram:<DiagTwoLights/> },
-  { id:3, name:"Timer → Light Color Change", diff:"Beginner", ch:"Ch. 6", type:"guided",
+  { id:3, name:"Timer → Light Color Change", diff:"Beginner", ch:"Ch. 6", type:"guided", components:["Relay","Timer"],
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NO 1PB — NC 2PB — 1TR coil (TON timer).","Rung 2: NO 1TR-1 (timed contact, draw with downward arrow) — CR1 coil.","Rung 3: NC CR1-1 — Y (yellow light). On before timer expires.","Rung 4: NO CR1-2 — G (green light). On after timer expires.","2PB cancels the timer at any time."],
     tips:["TON: coil energizes immediately, timed contact closes after delay","Timed contact drawn with a downward arrow below the bars","Yellow NC CR1 = on before; Green NO CR1 = on after"],
     checkpoints:["1TR coil labeled TON","Timed contact with downward arrow","CR1 energizes after timer","NC CR1 → Y light","NO CR1 → G light","2PB NC cancels timer"],
     diagram:<DiagThreeLightsTimer/> },
-  { id:4, name:"Single-Acting Cylinder w/ Limit Switch", diff:"Beginner", ch:"Ch. 7", type:"guided",
+  { id:4, name:"Single-Acting Cylinder w/ Limit Switch", diff:"Beginner", ch:"Ch. 7", type:"guided", components:["Relay","Latching Relay","Pneumatic","Solenoid/DCV"],
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NC STOP — NO START — CR1 coil. CR1-1 seal-in parallel with START.","Rung 2: NO CR1-2 — NC 2LS (opens when cylinder fully extends) — SOL-A coil (circle with wave).","Rung 3: NO CR1-3 — G (green light, cycle active).","Pneumatic: Air supply → FRL → 3/2 NO solenoid valve (SOL-A) → single-acting spring-return cylinder. Mark 1LS at retract end and 2LS at extend end."],
     tips:["SOL-A symbol is a circle with a squiggle/wave inside","FRL always first after supply","2LS is NC — extension trips it open, cutting SOL-A power"],
     checkpoints:["CR1 seal-in rung","SOL-A solenoid coil with wave symbol","2LS NC in SOL rung","G light on third rung","FRL on pneumatic","3/2 valve symbol","1LS and 2LS on cylinder"],
     diagram:<DiagBasicCylinder/> },
-  { id:5, name:"Jogging Circuit", diff:"Intermediate", ch:"Ch. 4", type:"guided",
+  { id:5, name:"Jogging Circuit", diff:"Intermediate", ch:"Ch. 4", type:"guided", components:["Motor","Relay","Latching Relay"],
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NC STOP — NO START — NC JOG — NC OL — M coil. M seal-in (M-1) in parallel with START only, between the START dot and the JOG NC dot.","Rung 2: NO JOG — NC OL — M coil. No seal-in on this rung.","When JOG is pressed: NC JOG breaks the seal-in path, Rung 2 powers M directly. Motor runs only while JOG is held."],
     tips:["NC JOG in Rung 1 must be placed AFTER the seal-in branch junction","Rung 2 has no seal-in — motor stops when JOG is released","OL is NC, in series on both rungs"],
     checkpoints:["NC JOG after seal-in junction in Rung 1","M seal-in between START dot and JOG NC dot","Separate JOG rung NO JOG only","NC OL in both rungs","M coil on both rungs"],
     diagram:<DiagJogging/> },
-  { id:6, name:"Forward / Reverse with Electrical Interlock", diff:"Intermediate", ch:"Ch. 5", type:"guided",
+  { id:6, name:"Forward / Reverse with Electrical Interlock", diff:"Intermediate", ch:"Ch. 5", type:"guided", components:["Motor","Relay","Latching Relay"],
     params:["24V / 0V rails. E-STOP (NC) on 24V rail.","Rung 1: NC STOP — NO F-PB — NC R (interlock) — NC OL — F coil. F-1 seal-in parallel with F-PB.","Rung 2: NC STOP — NO R-PB — NC F (interlock) — NC OL — R coil. R-1 seal-in parallel with R-PB.","Rung 3: NO F-2 — G light.","The NC R in Rung 1 and NC F in Rung 2 prevent F and R energizing simultaneously."],
     tips:["NC R in fwd rung blocks reverse from stealing the circuit","If F pulls in, NC F opens, preventing R from energizing","Seal-ins go in parallel with their own start PB only"],
     checkpoints:["NC R interlock in Forward rung","NC F interlock in Reverse rung","F-1 seal-in parallel with F-PB","R-1 seal-in parallel with R-PB","NC OL in both rungs","G light run indicator"],
     diagram:<DiagFwdRev/> },
-  { id:7, name:"Double-Acting Cylinder — Auto Retract", diff:"Intermediate", ch:"Ch. 7", type:"guided",
+  { id:7, name:"Double-Acting Cylinder — Auto Retract", diff:"Intermediate", ch:"Ch. 7", type:"guided", components:["Relay","Latching Relay","Pneumatic","Solenoid/DCV"],
     params:["24V / 0V rails. E-STOP (NC) on 24V rail. Draw ladder AND pneumatic.","Rung 1: NC STOP — NO START — NO 1LS (home) — CR1 coil. CR1-1 seal-in parallel with START.","Rung 2: NO CR1-2 — NC SOL-B (interlock) — SOL-A coil (extend).","Rung 3: NO 2LS (fully extended) — NC SOL-A (interlock) — SOL-B coil (retract).","Rung 4: NO CR1-3 — G light.","Pneumatic: FRL → 5/2 double-solenoid valve → double-acting cylinder. 1LS at retract, 2LS at extend."],
     tips:["NC SOL-B in SOL-A rung prevents both solenoids energizing together","1LS in start rung ensures cylinder is home","2LS at full extension triggers auto-retract"],
     checkpoints:["1LS home condition in start rung","CR1 seal-in","NC SOL-B in SOL-A rung","NC SOL-A in SOL-B rung","2LS triggers retract","G light rung","5/2 valve on pneumatic","Both LS on cylinder"],
     diagram:<DiagDoubleActing/> },
   // CHALLENGES
-  { id:8, name:"Latching Light", diff:"Beginner", ch:"Design", type:"challenge",
+  { id:8, name:"Latching Light", diff:"Beginner", ch:"Design", type:"challenge", components:["Latching Relay","Relay"],
     goal:"Nothing is powered until START has been pressed. Once START is pressed, a green light turns on and stays on even after START is released. A STOP button turns the green light back off. Use one relay.",
     hints:["You will need a seal-in (latching) contact to hold the relay in","The green light should be on a separate rung driven by the relay","Think about what keeps the relay energized after START is released"],
     checkpoints:["G light off before START","G light on and latched after START released","STOP kills G light","E-STOP kills everything","One relay used"] },
-  { id:9, name:"AND Logic — Two Buttons, One Light", diff:"Beginner", ch:"Design", type:"challenge",
+  { id:9, name:"AND Logic — Two Buttons, One Light", diff:"Beginner", ch:"Design", type:"challenge", components:["Logic"],
     goal:"A blue light should only turn on when BOTH PB1 AND PB2 are pressed at the same time. If either is released, the light goes off immediately. No latching — on only while both are held. No relay needed.",
     hints:["Series wiring = AND logic","Both contacts must be closed for current to flow","No seal-in needed — this is a momentary output"],
     checkpoints:["B light only on when both PB1 and PB2 held","Light off when either released","No latching","E-STOP present","Series wiring used"] },
-  { id:10, name:"OR Logic — Either Button, One Light", diff:"Beginner", ch:"Design", type:"challenge",
+  { id:10, name:"OR Logic — Either Button, One Light", diff:"Beginner", ch:"Design", type:"challenge", components:["Logic"],
     goal:"A yellow light should turn on when PB1 OR PB2 is pressed (or both). Releasing both turns it off. No latching. No relay needed.",
     hints:["Parallel wiring = OR logic","Two contacts in parallel means either one can pass current","E-STOP still goes on the rail"],
     checkpoints:["Y light on when PB1 pressed","Y light on when PB2 pressed","Y light on when both pressed","Light off when both released","Parallel wiring used"] },
-  { id:11, name:"Light Sequence with Interlock", diff:"Intermediate", ch:"Design", type:"challenge",
+  { id:11, name:"Light Sequence with Interlock", diff:"Intermediate", ch:"Design", type:"challenge", components:["Relay","Latching Relay","Logic"],
     goal:"When the system starts, a red light is on. When PB1 is pressed, red turns off and green turns on. When PB2 is pressed, green turns off and red comes back on. The two lights must never be on at the same time. Use one control relay.",
     hints:["NC contact of the relay drives the red light — on when relay is off","NO contact drives the green light — on when relay is on","PB1 energizes the relay (with seal-in), PB2 de-energizes it"],
     checkpoints:["R light on at start","PB1 switches R to G","PB2 switches G back to R","R and G never on simultaneously","One relay used","E-STOP kills all"] },
-  { id:12, name:"Timed Automatic Shutoff", diff:"Intermediate", ch:"Design", type:"challenge",
+  { id:12, name:"Timed Automatic Shutoff", diff:"Intermediate", ch:"Design", type:"challenge", components:["Timer","Solenoid/DCV","Pneumatic"],
     goal:"Pressing START energizes SOL-A and starts a timer. After 5 seconds the solenoid automatically shuts off. STOP can cancel at any time. A yellow light is on while the solenoid is active. A green light comes on once the timer has expired.",
     hints:["Timer and solenoid both need to run from the same START logic","A timed-open (TO) contact opens after the delay — use this to kill the solenoid","A timed-closed (TC) contact closes after the delay — use for the green light"],
     checkpoints:["SOL-A energizes on START","Timer starts simultaneously","SOL-A de-energizes after 5 seconds","Y light on while SOL-A active","G light on after timer expires","STOP cancels everything"] },
-  { id:13, name:"Three-Step Indicator Panel", diff:"Intermediate", ch:"Design", type:"challenge",
+  { id:13, name:"Three-Step Indicator Panel", diff:"Intermediate", ch:"Design", type:"challenge", components:["Relay","Latching Relay","Logic"],
     goal:"Three pushbuttons (PB1, PB2, PB3) and three lights (R, Y, G). Pressing PB1 turns on red only. PB2 turns on yellow only. PB3 turns on green only. Only one light on at a time. Pressing the same button again turns its light off.",
     hints:["Each pushbutton needs its own relay with a seal-in","Each relay should have NC contacts in the other two relay rungs (interlocks)","Think of this like a forward/reverse interlock but with three outputs"],
     checkpoints:["PB1 → R only","PB2 → Y only","PB3 → G only","No two lights on simultaneously","Interlocking NC contacts between all three relays","E-STOP kills all"] },
-  { id:14, name:"Four-Light Fault Indicator", diff:"Advanced", ch:"Design", type:"challenge",
+  { id:14, name:"Four-Light Fault Indicator", diff:"Advanced", ch:"Design", type:"challenge", components:["Relay","Logic"],
     goal:"Normal run (START pressed, no faults): green light on. Low pressure fault (PS1 trips): yellow on, green off. Overtemp fault (TS1 trips): red on, green and yellow off. Both faults: blue on, all others off. Priority: both faults (B) > overtemp (R) > low pressure (Y) > normal (G). E-STOP kills everything.",
     hints:["Use a dedicated relay for each condition","NC contacts from higher-priority relays block lower-priority lights","The both-faults condition needs AND logic — PS1 and TS1 both active","Priority is enforced by interlocking NC contacts of higher-priority relays into lower-priority rungs"],
     checkpoints:["G on during normal run","Y on (G off) during low pressure only","R on (G and Y off) during overtemp only","B on (all others off) during both faults","Priority order enforced","E-STOP kills all","NC interlocks between states"] },
@@ -1004,7 +1004,7 @@ export default function App() {
   const [drawn, setDrawn] = useState(null);
   const [showRef, setShowRef] = useState(false);
   const [showHints, setShowHints] = useState(false);
-  const [filter, setFilter] = useState("All");
+  const [filter, setFilter] = useState("All Components");
   const [panel, setPanel] = useState(null);
   const [phase2, setPhase2] = useState(null); // null | "sim"
   const [aiSimDef, setAiSimDef] = useState(null);   // AI-generated sim definition
@@ -1119,12 +1119,8 @@ export default function App() {
   };
   const clearKey = () => { localStorage.removeItem("anthropic_api_key"); setApiKey(""); };
 
-  const filters = ["All","Beginner","Intermediate","Advanced","Challenges"];
-  const visible = CIRCUITS.filter(c => {
-    if(filter==="All") return true;
-    if(filter==="Challenges") return c.type==="challenge";
-    return c.diff===filter;
-  });
+  const filters = ["All Components","Latching Relay","Relay","Motor","Pneumatic","Solenoid/DCV","Timer","Logic"];
+  const visible = CIRCUITS.filter(c => filter==="All Components" || c.components.includes(filter));
 
   const startRandomCircuit = () => {
     if (!visible.length) return;
@@ -1224,6 +1220,7 @@ export default function App() {
 
         {phase==="select" && (
           <>
+            <div style={{fontSize:10,color:"#64748b",letterSpacing:2,textTransform:"uppercase",marginBottom:6,fontWeight:700}}>Sort By Industry Components</div>
             <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
               {filters.map(f=>(
                 <button key={f} onClick={()=>setFilter(f)} style={{background:filter===f?"#4f46e5":"rgba(255,255,255,0.86)",color:filter===f?"#f8faff":"#55647d",border:"1px solid "+(filter===f?"#4f46e5":"#d7e4f4"),padding:"7px 12px",cursor:"pointer",fontSize:11,fontWeight:700}}>
@@ -1257,7 +1254,8 @@ export default function App() {
                     <span style={{fontSize:9,background:TC[c.type]+"18",color:TC[c.type],border:`1px solid ${TC[c.type]}33`,borderRadius:4,padding:"1px 6px",letterSpacing:1}}>{c.type==="challenge"?"CHALLENGE":"GUIDED"}</span>
                   </div>
                   <div style={{fontSize:13,fontWeight:700,color:"#0f172a",lineHeight:1.35,marginBottom:3}}>{c.name}</div>
-                  <div style={{fontSize:10,color:"#94a3b8"}}>{c.ch} · {c.checkpoints.length} checkpoints</div>
+                  <div style={{fontSize:10,color:"#94a3b8",marginBottom:3}}>{c.ch} · {c.checkpoints.length} checkpoints</div>
+                  <div style={{fontSize:10,color:"#64748b"}}>{c.components.join(" · ")}</div>
                 </button>
               ))}
             </div>
