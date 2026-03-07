@@ -9,106 +9,116 @@ const S = 1.5;
 // SYMBOLS
 // ═══════════════════════════════════════════════════════════════════
 function NO({ x, y, lbl }) {
+  // Two vertical bars, wire runs through, dots where wire meets bars
+  const lx = x + 8, rx = x + 20;
   return (
     <g>
-      {lbl && <text x={x+12} y={y-8} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>}
-      <line x1={x} y1={y} x2={x+8} y2={y} stroke={F} strokeWidth={S}/>
-      <circle cx={x+8} cy={y} r="2.2" fill={F}/>
-      <line x1={x+8} y1={y-7} x2={x+8} y2={y+7} stroke={F} strokeWidth={S}/>
-      <line x1={x+16} y1={y-7} x2={x+16} y2={y+7} stroke={F} strokeWidth={S}/>
-      <circle cx={x+16} cy={y} r="2.2" fill={F}/>
-      <line x1={x+16} y1={y} x2={x+24} y2={y} stroke={F} strokeWidth={S}/>
+      {lbl && <text x={x+14} y={y-10} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>}
+      <line x1={x} y1={y} x2={lx} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={lx} y1={y-9} x2={lx} y2={y+9} stroke={F} strokeWidth={S}/>
+      <line x1={rx} y1={y-9} x2={rx} y2={y+9} stroke={F} strokeWidth={S}/>
+      <line x1={rx} y1={y} x2={x+28} y2={y} stroke={F} strokeWidth={S}/>
     </g>
   );
 }
 function NC({ x, y, lbl }) {
+  // Same as NO but with diagonal slash
+  const lx = x + 8, rx = x + 20;
   return (
     <g>
-      {lbl && <text x={x+12} y={y-8} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>}
-      <line x1={x} y1={y} x2={x+8} y2={y} stroke={F} strokeWidth={S}/>
-      <circle cx={x+8} cy={y} r="2.2" fill={F}/>
-      <line x1={x+8} y1={y-7} x2={x+8} y2={y+7} stroke={F} strokeWidth={S}/>
-      <line x1={x+16} y1={y-7} x2={x+16} y2={y+7} stroke={F} strokeWidth={S}/>
-      <circle cx={x+16} cy={y} r="2.2" fill={F}/>
-      <line x1={x+16} y1={y} x2={x+24} y2={y} stroke={F} strokeWidth={S}/>
-      <line x1={x+5} y1={y+6} x2={x+19} y2={y-6} stroke={F} strokeWidth={S}/>
+      {lbl && <text x={x+14} y={y-10} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>}
+      <line x1={x} y1={y} x2={lx} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={lx} y1={y-9} x2={lx} y2={y+9} stroke={F} strokeWidth={S}/>
+      <line x1={rx} y1={y-9} x2={rx} y2={y+9} stroke={F} strokeWidth={S}/>
+      <line x1={rx} y1={y} x2={x+28} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={lx-2} y1={y+8} x2={rx+2} y2={y-8} stroke={F} strokeWidth={S}/>
     </g>
   );
 }
 function Coil({ x, y, lbl }) {
   return (
     <g>
-      <line x1={x} y1={y} x2={x+5} y2={y} stroke={F} strokeWidth={S}/>
-      <circle cx={x+16} cy={y} r="11" fill="none" stroke={F} strokeWidth={S}/>
-      <text x={x+16} y={y+3} textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>
-      <line x1={x+27} y1={y} x2={x+32} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={x} y1={y} x2={x+6} y2={y} stroke={F} strokeWidth={S}/>
+      <circle cx={x+18} cy={y} r="12" fill="none" stroke={F} strokeWidth={S}/>
+      <text x={x+18} y={y+4} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial" fontWeight="bold">{lbl}</text>
+      <line x1={x+30} y1={y} x2={x+36} y2={y} stroke={F} strokeWidth={S}/>
     </g>
   );
 }
 function SolCoil({ x, y, lbl }) {
+  // Solenoid: zigzag wave between two dots on a wire
+  const lx = x + 6, rx = x + 28;
+  const mid = (lx + rx) / 2;
   return (
     <g>
-      <line x1={x} y1={y} x2={x+5} y2={y} stroke={F} strokeWidth={S}/>
-      <circle cx={x+16} cy={y} r="11" fill="none" stroke={F} strokeWidth={S}/>
-      <path d={`M${x+8},${y} q2,-3.5,4,0 q2,3.5,4,0 q2,-3.5,3,0`} fill="none" stroke={F} strokeWidth="1.2"/>
-      <text x={x+16} y={y+18} textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>
-      <line x1={x+27} y1={y} x2={x+32} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={x} y1={y} x2={lx} y2={y} stroke={F} strokeWidth={S}/>
+      <circle cx={lx} cy={y} r="2.4" fill={F}/>
+      <polyline
+        points={`${lx+2},${y} ${mid-6},${y} ${mid-3},${y-9} ${mid+2},${y+9} ${mid+7},${y-9} ${mid+11},${y} ${rx-2},${y}`}
+        fill="none" stroke={F} strokeWidth={S} strokeLinejoin="round"/>
+      <circle cx={rx} cy={y} r="2.4" fill={F}/>
+      <line x1={rx} y1={y} x2={x+34} y2={y} stroke={F} strokeWidth={S}/>
+      {lbl && <text x={mid} y={y+15} textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>}
     </g>
   );
 }
 function Light({ x, y, lbl }) {
-  const cx = x+16, cy = y, r = 10, ray = 6;
+  // Circle with 4 diagonal rays at corners (NW, NE, SW, SE)
+  const cx = x+18, cy = y, r = 12, ray = 7;
+  const d = r * 0.707;
   return (
     <g>
-      <line x1={x} y1={y} x2={x+5} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={x} y1={y} x2={x+6} y2={y} stroke={F} strokeWidth={S}/>
       <circle cx={cx} cy={cy} r={r} fill="none" stroke={F} strokeWidth={S}/>
-      <line x1={cx-r*0.707-ray*0.707} y1={cy-r*0.707-ray*0.707} x2={cx-r*0.707} y2={cy-r*0.707} stroke={F} strokeWidth="1.3"/>
-      <line x1={cx+r*0.707} y1={cy-r*0.707} x2={cx+r*0.707+ray*0.707} y2={cy-r*0.707-ray*0.707} stroke={F} strokeWidth="1.3"/>
-      <line x1={cx-r*0.707-ray*0.707} y1={cy+r*0.707+ray*0.707} x2={cx-r*0.707} y2={cy+r*0.707} stroke={F} strokeWidth="1.3"/>
-      <line x1={cx+r*0.707} y1={cy+r*0.707} x2={cx+r*0.707+ray*0.707} y2={cy+r*0.707+ray*0.707} stroke={F} strokeWidth="1.3"/>
-      <text x={cx} y={cy+3} textAnchor="middle" fontSize="8" fontWeight="bold" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>
-      <line x1={x+27} y1={y} x2={x+32} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={cx-d} y1={cy-d} x2={cx-d-ray} y2={cy-d-ray} stroke={F} strokeWidth={S}/>
+      <line x1={cx+d} y1={cy-d} x2={cx+d+ray} y2={cy-d-ray} stroke={F} strokeWidth={S}/>
+      <line x1={cx-d} y1={cy+d} x2={cx-d-ray} y2={cy+d+ray} stroke={F} strokeWidth={S}/>
+      <line x1={cx+d} y1={cy+d} x2={cx+d+ray} y2={cy+d+ray} stroke={F} strokeWidth={S}/>
+      <line x1={x+30} y1={y} x2={x+36} y2={y} stroke={F} strokeWidth={S}/>
     </g>
   );
 }
 function LS({ x, y, lbl, nc }) {
+  // Lever arm: wire → dot → angled arm pointing up-right to contact dot → wire
+  // NC adds a diagonal slash through
+  const lx = x + 6, rx = x + 22;
+  const armTipX = rx - 2, armTipY = y - 12;
   return (
     <g>
-      {lbl && <text x={x+14} y={y-18} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>}
-      <line x1={x} y1={y} x2={x+6} y2={y} stroke={F} strokeWidth={S}/>
-      <circle cx={x+6} cy={y} r="2.2" fill={F}/>
-      <rect x={x+6} y={y-9} width="16" height="9" fill="none" stroke={F} strokeWidth={S}/>
-      <line x1={x+10} y1={y-9} x2={x+16} y2={y-16} stroke={F} strokeWidth={S}/>
-      <circle cx={x+17} cy={y-17} r="2.5" fill="none" stroke={F} strokeWidth="1.2"/>
-      {nc && <line x1={x+6} y1={y+3} x2={x+22} y2={y-9} stroke={F} strokeWidth={S}/>}
-      <circle cx={x+22} cy={y} r="2.2" fill={F}/>
-      <line x1={x+22} y1={y} x2={x+28} y2={y} stroke={F} strokeWidth={S}/>
+      {lbl && <text x={x+14} y={y-20} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>}
+      <line x1={x} y1={y} x2={lx} y2={y} stroke={F} strokeWidth={S}/>
+      <circle cx={lx} cy={y} r="2.4" fill={F}/>
+      <line x1={lx} y1={y} x2={armTipX} y2={armTipY} stroke={F} strokeWidth={S}/>
+      <circle cx={armTipX} cy={armTipY} r="2.4" fill="none" stroke={F} strokeWidth={S}/>
+      {nc && <line x1={lx-2} y1={y+5} x2={rx+2} y2={y-12} stroke={F} strokeWidth={S}/>}
+      <circle cx={rx} cy={y} r="2.4" fill={F}/>
+      <line x1={rx} y1={y} x2={x+28} y2={y} stroke={F} strokeWidth={S}/>
     </g>
   );
 }
 function TimerCoil({ x, y, lbl, type }) {
   return (
     <g>
-      <line x1={x} y1={y} x2={x+5} y2={y} stroke={F} strokeWidth={S}/>
-      <circle cx={x+16} cy={y} r="11" fill="none" stroke={F} strokeWidth={S}/>
-      <text x={x+16} y={y-1} textAnchor="middle" fontSize="7" fill={F} fontFamily="Arial Narrow,Arial">{lbl}</text>
-      <text x={x+16} y={y+8} textAnchor="middle" fontSize="6" fill={F} fontFamily="Arial Narrow,Arial">{type}</text>
-      <line x1={x+27} y1={y} x2={x+32} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={x} y1={y} x2={x+6} y2={y} stroke={F} strokeWidth={S}/>
+      <circle cx={x+18} cy={y} r="12" fill="none" stroke={F} strokeWidth={S}/>
+      <text x={x+18} y={y+1} textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial" fontWeight="bold">TR</text>
+      <line x1={x+30} y1={y} x2={x+36} y2={y} stroke={F} strokeWidth={S}/>
     </g>
   );
 }
 function EStop({ x, y }) {
+  // Two vertical bars (NC-style) with mushroom cap: arc over top + vertical stem
+  const lx = x + 8, rx = x + 20, mid = x + 14;
   return (
     <g>
-      <text x={x+12} y={y-8} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">E-STOP</text>
-      <line x1={x} y1={y} x2={x+8} y2={y} stroke={F} strokeWidth={S}/>
-      <circle cx={x+8} cy={y} r="2.2" fill={F}/>
-      <line x1={x+8} y1={y-7} x2={x+8} y2={y+7} stroke={F} strokeWidth={S}/>
-      <line x1={x+16} y1={y-7} x2={x+16} y2={y+7} stroke={F} strokeWidth={S}/>
-      <circle cx={x+16} cy={y} r="2.2" fill={F}/>
-      <line x1={x+16} y1={y} x2={x+24} y2={y} stroke={F} strokeWidth={S}/>
-      <line x1={x+5} y1={y+7} x2={x+19} y2={y-7} stroke={F} strokeWidth={S}/>
-      <line x1={x+12} y1={y-9} x2={x+15} y2={y-15} stroke={F} strokeWidth="1.2"/>
+      <text x={mid} y={y-18} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">E-STOP</text>
+      <line x1={x} y1={y} x2={lx} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={lx} y1={y-9} x2={lx} y2={y+9} stroke={F} strokeWidth={S}/>
+      <line x1={rx} y1={y-9} x2={rx} y2={y+9} stroke={F} strokeWidth={S}/>
+      <line x1={rx} y1={y} x2={x+28} y2={y} stroke={F} strokeWidth={S}/>
+      <line x1={lx-2} y1={y+8} x2={rx+2} y2={y-8} stroke={F} strokeWidth={S}/>
+      <line x1={mid} y1={y-9} x2={mid} y2={y-17} stroke={F} strokeWidth={S}/>
+      <path d={`M${lx-1},${y-9} Q${mid},${y-28} ${rx+1},${y-9}`} fill="none" stroke={F} strokeWidth={S}/>
     </g>
   );
 }
@@ -136,26 +146,28 @@ function SymbolIcon({ symbol }) {
       case "NO Contact":
         return (
           <>
-            {baseWires}
-            <line x1={lx} y1={y-8} x2={lx} y2={y+8} {...stroke}/>
-            <line x1={rx} y1={y-8} x2={rx} y2={y+8} {...stroke}/>
+            <line x1={wireL} y1={y} x2={lx} y2={y} {...stroke}/>
+            <line x1={lx} y1={y-9} x2={lx} y2={y+9} {...stroke}/>
+            <line x1={rx} y1={y-9} x2={rx} y2={y+9} {...stroke}/>
+            <line x1={rx} y1={y} x2={wireR} y2={y} {...stroke}/>
           </>
         );
       case "NC Contact":
         return (
           <>
-            {baseWires}
-            <line x1={lx} y1={y-8} x2={lx} y2={y+8} {...stroke}/>
-            <line x1={rx} y1={y-8} x2={rx} y2={y+8} {...stroke}/>
-            <line x1={lx+3} y1={y+7} x2={rx-3} y2={y-7} {...stroke}/>
+            <line x1={wireL} y1={y} x2={lx} y2={y} {...stroke}/>
+            <line x1={lx} y1={y-9} x2={lx} y2={y+9} {...stroke}/>
+            <line x1={rx} y1={y-9} x2={rx} y2={y+9} {...stroke}/>
+            <line x1={rx} y1={y} x2={wireR} y2={y} {...stroke}/>
+            <line x1={lx-2} y1={y+8} x2={rx+2} y2={y-8} {...stroke}/>
           </>
         );
       case "NO Pushbutton":
         return (
           <>
             {baseWires}
-            <line x1={lx+1} y1={y-6} x2={rx-1} y2={y-6} {...stroke}/>
-            <line x1={mid} y1={y-14} x2={mid} y2={y-6} {...stroke}/>
+            <line x1={lx+1} y1={y-7} x2={rx-1} y2={y-7} {...stroke}/>
+            <line x1={mid} y1={y-15} x2={mid} y2={y-7} {...stroke}/>
           </>
         );
       case "NC Pushbutton":
@@ -163,72 +175,96 @@ function SymbolIcon({ symbol }) {
           <>
             {baseWires}
             <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
-            <line x1={mid} y1={y-10} x2={mid} y2={y+1} {...stroke}/>
+            <line x1={mid} y1={y-11} x2={mid} y2={y+1} {...stroke}/>
           </>
         );
       case "Coil":
         return (
           <>
             <line x1={wireL} y1={y} x2={18} y2={y} {...stroke}/>
-            <circle cx={33} cy={y} r="11" {...stroke}/>
-            <text x="33" y="21" textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial" fontWeight="bold">CR</text>
-            <line x1={44} y1={y} x2={wireR} y2={y} {...stroke}/>
+            <circle cx={33} cy={y} r="12" {...stroke}/>
+            <text x="33" y="22" textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial" fontWeight="bold">CR</text>
+            <line x1={45} y1={y} x2={wireR} y2={y} {...stroke}/>
           </>
         );
-      case "Solenoid":
+      case "Solenoid": {
+        const smid = (lx + rx) / 2;
         return (
           <>
-            {baseWires}
-            <polyline points={`${lx+2},${y} ${mid-4},${y} ${mid+1},${y-8} ${mid+6},${y+8} ${rx-2},${y}`} {...stroke}/>
+            <line x1={wireL} y1={y} x2={lx} y2={y} {...stroke}/>
+            <circle cx={lx} cy={y} r="2.2" fill={F}/>
+            <polyline
+              points={`${lx+2},${y} ${smid-6},${y} ${smid-2},${y-9} ${smid+3},${y+9} ${smid+7},${y-9} ${smid+10},${y} ${rx-2},${y}`}
+              fill="none" stroke={F} strokeWidth="1.8" strokeLinejoin="round"/>
+            <circle cx={rx} cy={y} r="2.2" fill={F}/>
+            <line x1={rx} y1={y} x2={wireR} y2={y} {...stroke}/>
           </>
         );
-      case "Pilot Light":
+      }
+      case "Pilot Light": {
+        const pcx = 33, pr = 11, pd = pr * 0.707, pray = 6;
         return (
           <>
-            <line x1={wireL} y1={y} x2={18} y2={y} {...stroke}/>
-            <circle cx={33} cy={y} r="10" {...stroke}/>
-            <line x1="24" y1="9" x2="20" y2="5" {...stroke}/>
-            <line x1="42" y1="9" x2="46" y2="5" {...stroke}/>
-            <line x1="24" y1="27" x2="20" y2="31" {...stroke}/>
-            <line x1="42" y1="27" x2="46" y2="31" {...stroke}/>
-            <text x="33" y="21" textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial">L</text>
-            <line x1={44} y1={y} x2={wireR} y2={y} {...stroke}/>
+            <line x1={wireL} y1={y} x2={pcx - pr} y2={y} {...stroke}/>
+            <circle cx={pcx} cy={y} r={pr} {...stroke}/>
+            <line x1={pcx-pd} y1={y-pd} x2={pcx-pd-pray} y2={y-pd-pray} {...stroke}/>
+            <line x1={pcx+pd} y1={y-pd} x2={pcx+pd+pray} y2={y-pd-pray} {...stroke}/>
+            <line x1={pcx-pd} y1={y+pd} x2={pcx-pd-pray} y2={y+pd+pray} {...stroke}/>
+            <line x1={pcx+pd} y1={y+pd} x2={pcx+pd+pray} y2={y+pd+pray} {...stroke}/>
+            <line x1={pcx + pr} y1={y} x2={wireR} y2={y} {...stroke}/>
           </>
         );
+      }
       case "Timer":
         return (
           <>
             <line x1={wireL} y1={y} x2={18} y2={y} {...stroke}/>
-            <circle cx={33} cy={y} r="11" {...stroke}/>
-            <text x="33" y="21" textAnchor="middle" fontSize="8" fill={F} fontFamily="Arial Narrow,Arial" fontWeight="bold">TR</text>
-            <line x1={44} y1={y} x2={wireR} y2={y} {...stroke}/>
+            <circle cx={33} cy={y} r="12" {...stroke}/>
+            <text x="33" y="22" textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial" fontWeight="bold">TR</text>
+            <line x1={45} y1={y} x2={wireR} y2={y} {...stroke}/>
           </>
         );
-      case "NO Limit Switch":
+      case "NO Limit Switch": {
+        const armTipX = rx - 2, armTipY = y - 11;
         return (
           <>
-            {baseWires}
-            <polygon points={`${lx+2},${y+1} ${lx+10},${y-3} ${lx+10},${y+5}`} {...stroke}/>
-            <line x1={lx+2} y1={y+1} x2={rx-5} y2={y+6} {...stroke}/>
+            <line x1={wireL} y1={y} x2={lx} y2={y} {...stroke}/>
+            <circle cx={lx} cy={y} r="2.2" fill={F}/>
+            <line x1={lx} y1={y} x2={armTipX} y2={armTipY} {...stroke}/>
+            <circle cx={armTipX} cy={armTipY} r="2.2" fill="none" stroke={F} strokeWidth="1.8"/>
+            <circle cx={rx} cy={y} r="2.2" fill={F}/>
+            <line x1={rx} y1={y} x2={wireR} y2={y} {...stroke}/>
           </>
         );
-      case "NC Limit Switch":
+      }
+      case "NC Limit Switch": {
+        const armTipX = rx - 2, armTipY = y - 11;
         return (
           <>
-            {baseWires}
-            <polygon points={`${lx+2},${y+1} ${lx+10},${y-3} ${lx+10},${y+5}`} {...stroke}/>
-            <line x1={lx+2} y1={y+1} x2={rx-2} y2={y} {...stroke}/>
+            <line x1={wireL} y1={y} x2={lx} y2={y} {...stroke}/>
+            <circle cx={lx} cy={y} r="2.2" fill={F}/>
+            <line x1={lx} y1={y} x2={armTipX} y2={armTipY} {...stroke}/>
+            <circle cx={armTipX} cy={armTipY} r="2.2" fill="none" stroke={F} strokeWidth="1.8"/>
+            <line x1={lx-2} y1={y+6} x2={rx+2} y2={y-11} {...stroke}/>
+            <circle cx={rx} cy={y} r="2.2" fill={F}/>
+            <line x1={rx} y1={y} x2={wireR} y2={y} {...stroke}/>
           </>
         );
-      case "E-STOP":
+      }
+      case "E-STOP": {
+        const emid = (lx + rx) / 2;
         return (
           <>
-            {baseWires}
-            <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
-            <path d={`M${lx+1},${y-1} Q${mid},${y-18} ${rx-1},${y-1}`} {...stroke}/>
-            <line x1={mid} y1={y} x2={mid} y2={y-11} {...stroke}/>
+            <line x1={wireL} y1={y} x2={lx} y2={y} {...stroke}/>
+            <line x1={lx} y1={y-9} x2={lx} y2={y+9} {...stroke}/>
+            <line x1={rx} y1={y-9} x2={rx} y2={y+9} {...stroke}/>
+            <line x1={rx} y1={y} x2={wireR} y2={y} {...stroke}/>
+            <line x1={lx-2} y1={y+8} x2={rx+2} y2={y-8} {...stroke}/>
+            <line x1={emid} y1={y-9} x2={emid} y2={y-17} {...stroke}/>
+            <path d={`M${lx-1},${y-9} Q${emid},${y-27} ${rx+1},${y-9}`} fill="none" stroke={F} strokeWidth="1.8"/>
           </>
         );
+      }
       default:
         return null;
     }
@@ -667,49 +703,59 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
   const drawPushbutton = (ctx, x, y, isNC) => {
     const lx = x - 10;
     const rx = x + 10;
-    const mid = (lx + rx) / 2;
+    const mid = x;
     ctx.beginPath(); ctx.moveTo(x-24, y); ctx.lineTo(lx, y); ctx.stroke();
     drawNode(ctx, lx, y);
     drawNode(ctx, rx, y);
     if (isNC) {
+      // NC: bridge bar at wire level with downward stem
       ctx.beginPath(); ctx.moveTo(lx, y); ctx.lineTo(rx, y); ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(mid, y - 10);
+      ctx.moveTo(mid, y - 11);
       ctx.lineTo(mid, y + 1);
       ctx.stroke();
     } else {
+      // NO: horizontal bar above wire with stem down to gap
       ctx.beginPath();
-      ctx.moveTo(lx + 1, y - 6);
-      ctx.lineTo(rx - 1, y - 6);
+      ctx.moveTo(lx + 1, y - 8);
+      ctx.lineTo(rx - 1, y - 8);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(mid, y - 14);
-      ctx.lineTo(mid, y - 6);
+      ctx.moveTo(mid, y - 16);
+      ctx.lineTo(mid, y - 8);
       ctx.stroke();
     }
     ctx.beginPath(); ctx.moveTo(rx, y); ctx.lineTo(x+24, y); ctx.stroke();
   };
 
   const drawLimitSwitch = (ctx, x, y, isNC) => {
-    const lx = x - 10;
-    const rx = x + 10;
+    // Lever arm: dot → angled line to open contact circle, slash if NC
+    const lx = x - 12;
+    const rx = x + 12;
+    const armTipX = rx - 2, armTipY = y - 14;
 
     ctx.beginPath(); ctx.moveTo(x-24, y); ctx.lineTo(lx, y); ctx.stroke();
     drawNode(ctx, lx, y);
+
+    // lever arm
+    ctx.beginPath();
+    ctx.moveTo(lx, y);
+    ctx.lineTo(armTipX, armTipY);
+    ctx.stroke();
+
+    // contact circle at tip
+    ctx.beginPath();
+    ctx.arc(armTipX, armTipY, 2.5, 0, Math.PI*2);
+    ctx.stroke();
+
+    if (isNC) {
+      ctx.beginPath();
+      ctx.moveTo(lx - 2, y + 6);
+      ctx.lineTo(rx + 2, y - 13);
+      ctx.stroke();
+    }
+
     drawNode(ctx, rx, y);
-
-    ctx.beginPath();
-    ctx.moveTo(lx + 2, y + 1);
-    ctx.lineTo(lx + 10, y - 3);
-    ctx.lineTo(lx + 10, y + 5);
-    ctx.closePath();
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(lx + 2, y + 1);
-    ctx.lineTo(isNC ? rx - 2 : rx - 5, isNC ? y : y + 6);
-    ctx.stroke();
-
     ctx.beginPath(); ctx.moveTo(rx, y); ctx.lineTo(x+24, y); ctx.stroke();
   };
 
@@ -719,21 +765,18 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
     const s = 24;
     switch(symbolName) {
       case "NO Contact":
+        // Two vertical bars, plain wire, no dots
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x-10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x-10, y-9); ctx.lineTo(x-10, y+9); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+10, y-9); ctx.lineTo(x+10, y+9); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+10, y, 3, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-12, y-10); ctx.lineTo(x-12, y+10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+12, y-10); ctx.lineTo(x+12, y+10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "NC Contact":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        drawNode(ctx, x-10, y);
-        drawNode(ctx, x+10, y);
-        ctx.beginPath(); ctx.moveTo(x-10, y-9); ctx.lineTo(x-10, y+9); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+10, y-9); ctx.lineTo(x+10, y+9); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-7, y+7); ctx.lineTo(x+7, y-7); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-12, y-10); ctx.lineTo(x-12, y+10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+12, y-10); ctx.lineTo(x+12, y+10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-14, y+9); ctx.lineTo(x+14, y-9); ctx.stroke();
         break;
       case "NO Pushbutton":
         drawPushbutton(ctx, x, y, false);
@@ -742,41 +785,47 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         drawPushbutton(ctx, x, y, true);
         break;
       case "Coil":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+5, y, 13, 0, Math.PI*2); ctx.stroke();
-        ctx.font="bold 10px Arial"; ctx.fillText("CR", x+2, y+5);
-        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-14, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI*2); ctx.stroke();
+        ctx.font="bold 11px Arial"; ctx.fillText("CR", x-8, y+4);
+        ctx.beginPath(); ctx.moveTo(x+14, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "Solenoid":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-10, y); ctx.stroke();
-        drawNode(ctx, x-10, y);
-        drawNode(ctx, x+10, y);
+        // Zigzag wave between two dots
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        drawNode(ctx, x-12, y);
         ctx.beginPath();
-        ctx.moveTo(x-8, y);
-        ctx.lineTo(x-3, y);
-        ctx.lineTo(x+2, y-8);
-        ctx.lineTo(x+7, y+8);
-        ctx.lineTo(x+8, y);
+        ctx.moveTo(x-10, y);
+        ctx.lineTo(x-6, y);
+        ctx.lineTo(x-2, y-10);
+        ctx.lineTo(x+3, y+10);
+        ctx.lineTo(x+8, y-10);
+        ctx.lineTo(x+11, y);
         ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+10, y); ctx.lineTo(x+s, y); ctx.stroke();
+        drawNode(ctx, x+12, y);
+        ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
-      case "Pilot Light":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+5, y, 12, 0, Math.PI*2); ctx.stroke();
-        const r = 18;
+      case "Pilot Light": {
+        // Circle with 4 diagonal rays, no letter
+        const plr = 13;
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-plr, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y, plr, 0, Math.PI*2); ctx.stroke();
+        const rd = plr * 0.707, ray = 7;
         for(let i=0; i<4; i++) {
-          const a = (Math.PI/2)*i + Math.PI/4;
-          ctx.beginPath(); ctx.moveTo(x+5+Math.cos(a)*12, y+Math.sin(a)*12);
-          ctx.lineTo(x+5+Math.cos(a)*r, y+Math.sin(a)*r); ctx.stroke();
+          const a = Math.PI/4 + (Math.PI/2)*i;
+          ctx.beginPath();
+          ctx.moveTo(x+Math.cos(a)*plr, y+Math.sin(a)*plr);
+          ctx.lineTo(x+Math.cos(a)*(plr+ray), y+Math.sin(a)*(plr+ray));
+          ctx.stroke();
         }
-        ctx.font="8px Arial"; ctx.fillText("L", x+4, y+5);
-        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+plr, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
+      }
       case "Timer":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+5, y, 13, 0, Math.PI*2); ctx.stroke();
-        ctx.font="bold 9px Arial"; ctx.fillText("TR", x+2, y+5);
-        ctx.beginPath(); ctx.moveTo(x+18, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-14, y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI*2); ctx.stroke();
+        ctx.font="bold 10px Arial"; ctx.fillText("TR", x-8, y+4);
+        ctx.beginPath(); ctx.moveTo(x+14, y); ctx.lineTo(x+s, y); ctx.stroke();
         break;
       case "NO Limit Switch":
         drawLimitSwitch(ctx, x, y, false);
@@ -784,18 +833,21 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
       case "NC Limit Switch":
         drawLimitSwitch(ctx, x, y, true);
         break;
-      case "E-STOP":
-        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-8, y); ctx.stroke();
-        drawNode(ctx, x-8, y);
-        drawNode(ctx, x+12, y);
-        ctx.beginPath(); ctx.moveTo(x-8, y); ctx.lineTo(x+12, y); ctx.stroke();
+      case "E-STOP": {
+        // Two vertical bars with diagonal slash (NC style) + mushroom cap
+        ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-12, y-10); ctx.lineTo(x-12, y+10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+12, y-10); ctx.lineTo(x+12, y+10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-14, y+9); ctx.lineTo(x+14, y-9); ctx.stroke();
+        // mushroom stem + cap arc
+        ctx.beginPath(); ctx.moveTo(x, y-10); ctx.lineTo(x, y-20); ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(x-7, y-1);
-        ctx.quadraticCurveTo(x+2, y-18, x+11, y-1);
+        ctx.moveTo(x-13, y-10);
+        ctx.quadraticCurveTo(x, y-34, x+13, y-10);
         ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+2, y); ctx.lineTo(x+2, y-11); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s+4, y); ctx.stroke();
         break;
+      }
       default: break;
     }
   };
