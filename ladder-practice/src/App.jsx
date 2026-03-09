@@ -107,18 +107,17 @@ function TimerCoil({ x, y, lbl, type }) {
   );
 }
 function EStop({ x, y }) {
-  // Two vertical bars (NC-style) with mushroom cap: arc over top + vertical stem
+  // X-pattern contact + mushroom cap (oval) above
   const lx = x + 8, rx = x + 20, mid = x + 14;
   return (
     <g>
-      <text x={mid} y={y-18} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">E-STOP</text>
+      <text x={mid} y={y-21} textAnchor="middle" fontSize="9" fill={F} fontFamily="Arial Narrow,Arial">E-STOP</text>
       <line x1={x} y1={y} x2={lx} y2={y} stroke={F} strokeWidth={S}/>
-      <line x1={lx} y1={y-9} x2={lx} y2={y+9} stroke={F} strokeWidth={S}/>
-      <line x1={rx} y1={y-9} x2={rx} y2={y+9} stroke={F} strokeWidth={S}/>
       <line x1={rx} y1={y} x2={x+28} y2={y} stroke={F} strokeWidth={S}/>
-      <line x1={lx-2} y1={y+8} x2={rx+2} y2={y-8} stroke={F} strokeWidth={S}/>
-      <line x1={mid} y1={y-9} x2={mid} y2={y-17} stroke={F} strokeWidth={S}/>
-      <path d={`M${lx-1},${y-9} Q${mid},${y-28} ${rx+1},${y-9}`} fill="none" stroke={F} strokeWidth={S}/>
+      <line x1={lx} y1={y-9} x2={rx} y2={y+9} stroke={F} strokeWidth={S}/>
+      <line x1={lx} y1={y+9} x2={rx} y2={y-9} stroke={F} strokeWidth={S}/>
+      <line x1={mid} y1={y-9} x2={mid} y2={y-16} stroke={F} strokeWidth={S}/>
+      <ellipse cx={mid} cy={y-19} rx="9" ry="4" fill="none" stroke={F} strokeWidth={S}/>
     </g>
   );
 }
@@ -175,7 +174,7 @@ function SymbolIcon({ symbol }) {
           <>
             {baseWires}
             <line x1={lx} y1={y} x2={rx} y2={y} {...stroke}/>
-            <line x1={mid} y1={y-11} x2={mid} y2={y+1} {...stroke}/>
+            <line x1={mid} y1={y-11} x2={mid} y2={y} {...stroke}/>
           </>
         );
       case "Coil":
@@ -256,12 +255,11 @@ function SymbolIcon({ symbol }) {
         return (
           <>
             <line x1={wireL} y1={y} x2={lx} y2={y} {...stroke}/>
-            <line x1={lx} y1={y-9} x2={lx} y2={y+9} {...stroke}/>
-            <line x1={rx} y1={y-9} x2={rx} y2={y+9} {...stroke}/>
             <line x1={rx} y1={y} x2={wireR} y2={y} {...stroke}/>
-            <line x1={lx-2} y1={y+8} x2={rx+2} y2={y-8} {...stroke}/>
+            <line x1={lx} y1={y-9} x2={rx} y2={y+9} {...stroke}/>
+            <line x1={lx} y1={y+9} x2={rx} y2={y-9} {...stroke}/>
             <line x1={emid} y1={y-9} x2={emid} y2={y-17} {...stroke}/>
-            <path d={`M${lx-1},${y-9} Q${emid},${y-27} ${rx+1},${y-9}`} fill="none" stroke={F} strokeWidth="1.8"/>
+            <ellipse cx={emid} cy={y-20} rx="9" ry="4" fill="none" stroke={F} strokeWidth="1.8"/>
           </>
         );
       }
@@ -712,7 +710,7 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
       ctx.beginPath(); ctx.moveTo(lx, y); ctx.lineTo(rx, y); ctx.stroke();
       ctx.beginPath();
       ctx.moveTo(mid, y - 11);
-      ctx.lineTo(mid, y + 1);
+      ctx.lineTo(mid, y);
       ctx.stroke();
     } else {
       // NO: horizontal bar above wire with stem down to gap
@@ -834,18 +832,13 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         drawLimitSwitch(ctx, x, y, true);
         break;
       case "E-STOP": {
-        // Two vertical bars with diagonal slash (NC style) + mushroom cap
+        // X-pattern contact + oval mushroom cap (matches SVG reference)
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-12, y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-12, y-10); ctx.lineTo(x-12, y+10); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+12, y-10); ctx.lineTo(x+12, y+10); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(x+12, y); ctx.lineTo(x+s, y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x-14, y+9); ctx.lineTo(x+14, y-9); ctx.stroke();
-        // mushroom stem + cap arc
+        ctx.beginPath(); ctx.moveTo(x-12, y-10); ctx.lineTo(x+12, y+10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-12, y+10); ctx.lineTo(x+12, y-10); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(x, y-10); ctx.lineTo(x, y-20); ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x-13, y-10);
-        ctx.quadraticCurveTo(x, y-34, x+13, y-10);
-        ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(x, y-24, 11, 4, 0, 0, Math.PI*2); ctx.stroke();
         break;
       }
       default: break;
