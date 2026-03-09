@@ -810,7 +810,7 @@ function Canvas({ onSubmit, onTest, isSandbox }) {
         const plr = 13;
         ctx.beginPath(); ctx.moveTo(x-s, y); ctx.lineTo(x-plr, y); ctx.stroke();
         ctx.beginPath(); ctx.arc(x, y, plr, 0, Math.PI*2); ctx.stroke();
-        const rd = plr * 0.707, ray = 7;
+        const ray = 7;
         for(let i=0; i<4; i++) {
           const a = Math.PI/4 + (Math.PI/2)*i;
           ctx.beginPath();
